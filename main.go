@@ -1,5 +1,7 @@
 package main
 
-func main() {
+import "prototype.mathbase.app/crawler"
 
+func main() {
+	crawler.Crawle()
 }
