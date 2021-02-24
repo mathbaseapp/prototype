@@ -5,5 +5,10 @@
             <h2>result for "{{.query}}"</h2>
         </div>
 
+        <div class="pure-u-1">
+            {{range .results}}
+                <p><a href="{{.URL}}">{{.Title}}</a></p>
+            {{end}}
+        </div>
     </div>
 {{end}}

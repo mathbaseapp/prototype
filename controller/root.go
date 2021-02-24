@@ -26,8 +26,13 @@ func index(c *gin.Context) {
 }
 
 func queryByTex(c *gin.Context) {
+	results := []PageResult{
+		PageResult{"qiita-home1", "https://qiita.com"},
+		PageResult{"qiita-home2", "https://qiita.com"},
+	}
 	queryStr := c.DefaultQuery("query", "")
 	c.HTML(http.StatusOK, "search", gin.H{
-		"query": queryStr,
+		"query":   queryStr,
+		"results": results,
 	})
 }
