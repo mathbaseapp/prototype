@@ -6,9 +6,11 @@
         </div>
 
         <div class="pure-u-1">
-            {{range .results}}
-                <p><a href="{{.URL}}">{{.Title}}</a></p>
-            {{end}}
+            <ul>
+                {{range .results}}
+                    <li><a href="{{.URL}}">{{.Title}}</a></li>
+                {{end}}
+            </ul>
         </div>
     </div>
 {{end}}
