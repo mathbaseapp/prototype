@@ -38,7 +38,7 @@ func (latexParser) Parse(source string) (ParseResult, error) {
 	}
 	node := xmlNode{}
 	xml.Unmarshal(out, &node)
-	return ParseResult{Source: source, Node: mathMLNodeFactory(&node)}, nil
+	return ParseResult{Source: source, Node: mathMLFactory(&node)}, nil
 }
 
 type mathmlParser struct{}
@@ -48,7 +48,7 @@ func (mathmlParser) Parse(source string) (ParseResult, error) {
 	bsource := []byte(source)
 	node := xmlNode{}
 	xml.Unmarshal(bsource, &node)
-	return ParseResult{Source: source, Node: mathMLNodeFactory(&node)}, nil
+	return ParseResult{Source: source, Node: mathMLFactory(&node)}, nil
 }
 
 // GetParser 適切なコンテンツパーサーを返却します
