@@ -7,10 +7,10 @@ import (
 
 // Node XMLを表現する
 type Node struct {
-	XMLName    xml.Name
-	Attributes []xml.Attr
-	Value      string
-	Nodes      []*Node
+	Name  xml.Name
+	Attr  []xml.Attr
+	Value string
+	Nodes []*Node
 }
 
 // UnmarshalXML XMLからデコード
@@ -33,16 +33,16 @@ func (e *Node) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
 			done = true
 		}
 	}
-	e.XMLName = start.Name
-	e.Attributes = start.Attr
+	e.Name = start.Name
+	e.Attr = start.Attr
 	e.Nodes = nodes
 	return nil
 }
 
 // MarshalXML XMLにエンコード
 func (e *Node) MarshalXML(enc *xml.Encoder, start xml.StartElement) error {
-	start.Name = e.XMLName
-	start.Attr = e.Attributes
+	start.Name = e.Name
+	start.Attr = e.Attr
 	return enc.EncodeElement(struct {
 		Data  string `xml:",chardata"`
 		Nodes []*Node
