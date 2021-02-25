@@ -2,12 +2,13 @@ package converter
 
 import "prototype.mathbase.app/mathml"
 
-func defaultNodeFactory(node *xmlNode) mathml.Node {
+func mathMLNodeFactory(node *xmlNode) *mathml.Node {
 
-	children := []mathml.Node{}
+	children := []*mathml.Node{}
 	for _, n := range node.Nodes {
-		children = append(children, defaultNodeFactory(n))
+		children = append(children, mathMLNodeFactory(n))
 	}
 
-	return mathml.DefaultNode(node.Name, node.Value, children, mathml.Presentation)
+	mNode := mathml.Node{Name: node.Name, Value: node.Value, Children: children, Style: mathml.Presentation}
+	return &mNode
 }

@@ -15,9 +15,9 @@ const (
 )
 
 // Node MathMLにおけるNodeを表現します
-type Node interface {
-	GetName() xml.Name
-	GetValue() string
-	GetChildren() []Node
-	GetStyle() MarkupStyle
+type Node struct {
+	Name     xml.Name
+	Value    string
+	Children []*Node
+	Style    MarkupStyle
 }
