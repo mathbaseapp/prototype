@@ -13,13 +13,13 @@ func Printer(node *Node) string {
 func printer(node *Node, builder *strings.Builder) {
 
 	builder.WriteString("<")
-	builder.WriteString(node.Name.Local)
+	builder.WriteString(node.Name)
 	builder.WriteString(">")
 	builder.WriteString(node.Value)
 	for _, child := range node.Children {
 		printer(child, builder)
 	}
 	builder.WriteString("</")
-	builder.WriteString(node.Name.Local)
+	builder.WriteString(node.Name)
 	builder.WriteString(">")
 }

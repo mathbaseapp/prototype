@@ -1,9 +1,5 @@
 package mathml
 
-import (
-	"encoding/xml"
-)
-
 // MarkupStyle マークアップの表現方法を示します
 type MarkupStyle string
 
@@ -16,7 +12,7 @@ const (
 
 // Node MathMLにおけるNodeを表現します
 type Node struct {
-	Name     xml.Name
+	Name     string
 	Value    string
 	Children []*Node
 	Style    MarkupStyle
