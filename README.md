@@ -1,3 +1,6 @@
+## 外部依存コマンド
+- pandoc
+
 ## DBセットアップ
 
 `docker`,`docker-compose`は予めインストール。
