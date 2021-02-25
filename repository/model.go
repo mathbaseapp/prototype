@@ -1,20 +1,22 @@
 package repository
 
+import "go.mongodb.org/mongo-driver/bson/primitive"
+
 // Index index
 type Index struct {
-	Key        string
-	FragmentID string
+	Key        string `key`
+	FragmentID primitive.ObjectID
 }
 
 // Fragment ページ内の数式
 type Fragment struct {
-	ID  string
-	Loc string
-	URL string
+	ID  primitive.ObjectID `_id`
+	Loc string             `loc`
+	URL string             `url`
 }
 
 // Document qiitaのページ
 type Document struct {
-	URL     string
-	Content string
+	URL     string `url`
+	Content string `content`
 }

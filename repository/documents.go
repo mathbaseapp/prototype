@@ -7,7 +7,7 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 )
 
-const colname = "document"
+const doccolname = "document"
 
 // Documents DocumentRepository
 var Documents = newDocuments()
@@ -25,7 +25,7 @@ func newDocuments() *documents {
 func (d *documents) InsertOne(doc *Document) {
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
-	collection := d.collectionOf(colname)
+	collection := d.collectionOf(doccolname)
 	collection.InsertOne(ctx, doc)
 }
 
@@ -33,7 +33,7 @@ func (d *documents) InsertOne(doc *Document) {
 func (d *documents) SelectByURL(URL string) *Document {
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
-	collection := d.collectionOf(colname)
+	collection := d.collectionOf(doccolname)
 	document := Document{}
 	collection.FindOne(ctx, bson.M{"url": URL}).Decode(&document)
 	return &document
