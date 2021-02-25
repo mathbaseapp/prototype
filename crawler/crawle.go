@@ -6,6 +6,7 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	"regexp"
 	"strings"
 	"time"
 )
@@ -36,6 +37,7 @@ func Crawle() {
 
 	for _, item := range articles {
 		texs := getTex(item.Body)
+		_ = texs
 		fmt.Printf("\n\n%s に含まれるtexコードは以下の通り\n", item.Title)
 		for i, tex := range texs {
 			fmt.Printf("\nno.%d\n", i)
@@ -47,6 +49,9 @@ func Crawle() {
 	}
 
 }
+
+var inlineReg = regexp.MustCompile(`[^\$]*\$([^\$]+)\$`) // $ ~ $ で囲まれる箇所
+var displayReg = regexp.MustCompile(`\$\$([^\$]+)\$\$`)  // $$ ~ $$ で囲まれる箇所
 
 func getTex(body string) [][]string {
 	var texs [][]string
@@ -66,6 +71,20 @@ func getTex(body string) [][]string {
 		}
 		if line == "```math" {
 			mathFlg = true
+		}
+
+		// $ ~ $ で囲まれる部分
+		if matches := inlineReg.FindAllStringSubmatch(line, -1); len(matches) > 1 {
+			for _, match := range matches {
+				texs = append(texs, match[1:])
+			}
+		}
+
+		// $$ ~ $$ で囲まれる部分
+		if matches := displayReg.FindAllStringSubmatch(line, -1); len(matches) > 1 {
+			for _, match := range matches {
+				texs = append(texs, match[1:])
+			}
 		}
 	}
 	return texs
