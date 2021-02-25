@@ -19,6 +19,8 @@ type DocumentType string
 const (
 	// Latex LaTeX
 	Latex = DocumentType("latex")
+	// MathML mathml
+	MathML = DocumentType("mathml")
 )
 
 // Parser MathMLに変換するためのパーサーを定義します
@@ -28,8 +30,7 @@ type Parser interface {
 
 type latexParser struct{}
 
-// Parse latexparser
-func (p latexParser) Parse(source string) (ParseResult, error) {
+func (latexParser) Parse(source string) (ParseResult, error) {
 	pandocCmd := "echo '$$" + source + "$$'  | pandoc -f html+tex_math_dollars -t html --mathml"
 	out, err := exec.Command("sh", "-c", pandocCmd).Output()
 	if err != nil {
@@ -37,12 +38,28 @@ func (p latexParser) Parse(source string) (ParseResult, error) {
 	}
 	node := xmlNode{}
 	xml.Unmarshal(out, &node)
-	mNode := mathMLNodeFactory(&node)
-	return ParseResult{Source: source, Node: mNode}, nil
+	return ParseResult{Source: source, Node: mathMLNodeFactory(&node)}, nil
+}
+
+type mathmlParser struct{}
+
+func (mathmlParser) Parse(source string) (ParseResult, error) {
+
+	bsource := []byte(source)
+	node := xmlNode{}
+	xml.Unmarshal(bsource, &node)
+	return ParseResult{Source: source, Node: mathMLNodeFactory(&node)}, nil
 }
 
 // GetParser 適切なコンテンツパーサーを返却します
 func GetParser(docType DocumentType) Parser {
 
-	return latexParser{}
+	switch docType {
+	case Latex:
+		return latexParser{}
+	case MathML:
+		return mathmlParser{}
+	default:
+		panic("incorrect document type.")
+	}
 }
