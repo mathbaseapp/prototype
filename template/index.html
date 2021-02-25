@@ -1,0 +1,16 @@
+{{define "content"}}
+    <div class="pure-g">
+
+        <div class="pure-u-1">
+            <h2>mathbase demo app</h2>
+        </div>
+
+        <div class="pure-u-1">
+            <form action="/search" method="get" class="pure-form pure-form-stacked">
+                <label for="query">type LaTeX query below.</label>
+                <input name="query" id="query" placeholder="EX) \sin{\theta}">
+                <button class="pure-button pure-button-primary">Search</button>
+            </form>
+        </div>
+    </div>
+{{end}}
