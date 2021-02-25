@@ -7,6 +7,7 @@ import (
 	"log"
 	"net/http"
 	"regexp"
+	"strconv"
 	"strings"
 	"time"
 )
@@ -18,34 +19,47 @@ type Article struct {
 }
 
 func Crawle() {
-	tag := "math"
-	res, err := http.Get("http://qiita.com/api/v2/tags/" + tag + "/items")
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer res.Body.Close()
-	body, err := ioutil.ReadAll(res.Body)
-	if err != nil {
-		log.Fatal(err)
-	}
+	accessToken := "04955c64db710699566b3420e4a8ae01ec907dd6"
+	per_page := "100" // 1ページあたりの記事数 1~100の間
 
-	var articles []Article
+	for _, tag := range TAGS {
+		for i := 1; i <= 100; i++ {
+			time.Sleep(time.Second * 5) // 1時間に1000回のアクセス制限に引っかからないよう止める
+			page := strconv.Itoa(i)
 
-	if err := json.Unmarshal(body, &articles); err != nil {
-		log.Fatal(err)
-	}
+			url := "http://qiita.com/api/v2/tags/" + tag + "/items?per_page=" + per_page + "&page=" + page
+			req, _ := http.NewRequest("GET", url, nil)
+			req.Header.Set("Authorization", "Bearer "+accessToken)
 
-	for _, item := range articles {
-		texs := getTex(item.Body)
-		_ = texs
-		fmt.Printf("\n\n%s に含まれるtexコードは以下の通り\n", item.Title)
-		for i, tex := range texs {
-			fmt.Printf("\nno.%d\n", i)
-			for _, item := range tex {
-				fmt.Printf("\t%s\n", item)
+			client := new(http.Client)
+			res, err := client.Do(req)
+			if err != nil {
+				log.Fatal(err)
+			}
+			defer res.Body.Close()
+			body, err := ioutil.ReadAll(res.Body)
+			if err != nil {
+				log.Fatal(err)
+			}
+
+			var articles []Article
+
+			if err := json.Unmarshal(body, &articles); err != nil {
+				log.Fatal(err)
+			}
+
+			for _, item := range articles {
+				texs := getTex(item.Body)
+				_ = texs
+				fmt.Printf("\n\n%s に含まれるtexコードは以下の通り\n", item.Title)
+				for i, tex := range texs {
+					fmt.Printf("\nno.%d\n", i)
+					for _, item := range tex {
+						fmt.Printf("\t%s\n", item)
+					}
+				}
 			}
 		}
-		// fmt.Printf("%s\n", item.Body)
 	}
 
 }
