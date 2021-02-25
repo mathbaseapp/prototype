@@ -18,5 +18,6 @@ type Fragment struct {
 // Document qiitaのページ
 type Document struct {
 	URL     string `url`
+	Title   string `title`
 	Content string `content`
 }
