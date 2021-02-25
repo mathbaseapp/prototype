@@ -3,12 +3,14 @@ package converter
 import (
 	"encoding/xml"
 	"os/exec"
+
+	"prototype.mathbase.app/mathml"
 )
 
 // ParseResult パース時の結果を表します
 type ParseResult struct {
 	Source string
-	Node   MathMLNode
+	Node   mathml.Node
 }
 
 // DocumentType ドキュメント形式
@@ -35,7 +37,7 @@ func (p latexParser) Parse(source string) (ParseResult, error) {
 	}
 	node := xmlNode{}
 	xml.Unmarshal(out, &node)
-	mNode := mathMLFactory(&node)
+	mNode := defaultNodeFactory(&node)
 	return ParseResult{Source: source, Node: mNode}, nil
 }
 
