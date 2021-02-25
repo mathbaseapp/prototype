@@ -50,7 +50,7 @@ func (m DefaultMathMLNode) Style() MarkupStyle {
 	return Presentation
 }
 
-func mathMLFactory(node *Node) MathMLNode {
+func mathMLFactory(node *xmlNode) MathMLNode {
 
 	children := []MathMLNode{}
 	for _, n := range node.Nodes {
@@ -63,7 +63,7 @@ func mathMLFactory(node *Node) MathMLNode {
 // Run app
 func Run() {
 	latexStr := "$$x = 4$$"
-	var parser Parser = LatexParser{}
+	parser := getParser(Latex)
 	mathml, _ := parser.Parse(latexStr)
 	fmt.Println(mathml)
 }

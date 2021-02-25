@@ -5,17 +5,16 @@ import (
 	"strings"
 )
 
-// Node XMLを表現する
-type Node struct {
+type xmlNode struct {
 	Name  xml.Name
 	Attr  []xml.Attr
 	Value string
-	Nodes []*Node
+	Nodes []*xmlNode
 }
 
 // UnmarshalXML XMLからデコード
-func (e *Node) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
-	var nodes []*Node
+func (e *xmlNode) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
+	var nodes []*xmlNode
 	var done bool
 	for !done {
 		t, err := d.Token()
@@ -26,7 +25,7 @@ func (e *Node) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
 		case xml.CharData:
 			e.Value = strings.TrimSpace(string(t))
 		case xml.StartElement:
-			e := &Node{}
+			e := &xmlNode{}
 			e.UnmarshalXML(d, t)
 			nodes = append(nodes, e)
 		case xml.EndElement:
@@ -40,12 +39,12 @@ func (e *Node) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
 }
 
 // MarshalXML XMLにエンコード
-func (e *Node) MarshalXML(enc *xml.Encoder, start xml.StartElement) error {
+func (e *xmlNode) MarshalXML(enc *xml.Encoder, start xml.StartElement) error {
 	start.Name = e.Name
 	start.Attr = e.Attr
 	return enc.EncodeElement(struct {
 		Data  string `xml:",chardata"`
-		Nodes []*Node
+		Nodes []*xmlNode
 	}{
 		Data:  e.Value,
 		Nodes: e.Nodes,
