@@ -8,15 +8,13 @@ type Index struct {
 
 // Fragment ページ内の数式
 type Fragment struct {
-	ID         string
-	DocumentID string
-	Loc        string
-	URL        string // 正規化崩そう
+	ID  string
+	Loc string
+	URL string
 }
 
 // Document qiitaのページ
 type Document struct {
-	ID      string
 	URL     string
 	Content string
 }
