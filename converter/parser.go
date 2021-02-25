@@ -5,6 +5,12 @@ import (
 	"os/exec"
 )
 
+// ParseResult パース時の結果を表します
+type ParseResult struct {
+	Source string
+	Node   MathMLNode
+}
+
 // DocumentType ドキュメント形式
 type DocumentType string
 
@@ -15,21 +21,22 @@ const (
 
 // Parser MathMLに変換するためのパーサーを定義します
 type Parser interface {
-	Parse(string) (MathMLNode, error)
+	Parse(string) (ParseResult, error)
 }
 
 type latexParser struct{}
 
 // Parse latexparser
-func (p latexParser) Parse(source string) (MathMLNode, error) {
-	pandocCmd := "echo '" + source + "'  | pandoc -f html+tex_math_dollars -t html --mathml"
+func (p latexParser) Parse(source string) (ParseResult, error) {
+	pandocCmd := "echo '$$" + source + "$$'  | pandoc -f html+tex_math_dollars -t html --mathml"
 	out, err := exec.Command("sh", "-c", pandocCmd).Output()
 	if err != nil {
 		panic("pandoc cannot execute. is not installed?") // TODO エラーハンドリング
 	}
 	node := xmlNode{}
 	xml.Unmarshal(out, &node)
-	return mathMLFactory(&node), nil
+	mNode := mathMLFactory(&node)
+	return ParseResult{Source: source, Node: mNode}, nil
 }
 
 // GetParser 適切なコンテンツパーサーを返却します

@@ -2,7 +2,6 @@ package converter
 
 import (
 	"encoding/xml"
-	"fmt"
 )
 
 // MarkupStyle マークアップの表現方法を示します
@@ -58,12 +57,4 @@ func mathMLFactory(node *xmlNode) MathMLNode {
 	}
 
 	return DefaultMathMLNode{node.Name, node.Value, children}
-}
-
-// Run app
-func Run() {
-	latexStr := "$$x = 4$$"
-	parser := GetParser(Latex)
-	mathml, _ := parser.Parse(latexStr)
-	fmt.Println(mathml)
 }
