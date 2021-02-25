@@ -3,7 +3,6 @@ package converter
 import (
 	"encoding/xml"
 	"fmt"
-	"os/exec"
 )
 
 // MarkupStyle マークアップの表現方法を示します
@@ -64,14 +63,7 @@ func mathMLFactory(node *Node) MathMLNode {
 // Run app
 func Run() {
 	latexStr := "$$x = 4$$"
-	pandocCmd := "echo '" + latexStr + "'  | pandoc -f html+tex_math_dollars -t html --mathml"
-	out, err := exec.Command("sh", "-c", pandocCmd).Output()
-	str := Node{}
-	fmt.Println(string(out))
-	xml.Unmarshal(out, &str)
-
-	if err != nil {
-		fmt.Println("Command Exec Error.")
-	}
-	fmt.Println(mathMLFactory(&str))
+	var parser Parser = LatexParser{}
+	mathml, _ := parser.Parse(latexStr)
+	fmt.Println(mathml)
 }
