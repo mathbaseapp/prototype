@@ -32,7 +32,8 @@ func (p latexParser) Parse(source string) (MathMLNode, error) {
 	return mathMLFactory(&node), nil
 }
 
-func getParser(docType DocumentType) Parser {
+// GetParser 適切なコンテンツパーサーを返却します
+func GetParser(docType DocumentType) Parser {
 
 	return latexParser{}
 }

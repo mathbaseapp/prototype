@@ -63,7 +63,7 @@ func mathMLFactory(node *xmlNode) MathMLNode {
 // Run app
 func Run() {
 	latexStr := "$$x = 4$$"
-	parser := getParser(Latex)
+	parser := GetParser(Latex)
 	mathml, _ := parser.Parse(latexStr)
 	fmt.Println(mathml)
 }
