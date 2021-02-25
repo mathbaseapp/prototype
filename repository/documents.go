@@ -22,7 +22,7 @@ func newDocuments() *documents {
 }
 
 // InsertOne Documentの挿入
-func (d documents) InsertOne(doc *Document) {
+func (d *documents) InsertOne(doc *Document) {
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
 	collection := d.collectionOf(colname)
@@ -30,7 +30,7 @@ func (d documents) InsertOne(doc *Document) {
 }
 
 // SelectByURL Documentの取得
-func (d documents) SelectByURL(URL string) *Document {
+func (d *documents) SelectByURL(URL string) *Document {
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
 	collection := d.collectionOf(colname)
