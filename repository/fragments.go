@@ -23,11 +23,16 @@ func newFragments() *fragremts {
 }
 
 // InsertOne Documentの挿入
-func (d *fragremts) InsertOne(frag *Fragment) {
+func (d *fragremts) InsertOne(frag *Fragment) (*Fragment, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
 	collection := d.collectionOf(flagcolname)
-	collection.InsertOne(ctx, frag)
+	res, err := collection.InsertOne(ctx, frag)
+	if err != nil {
+		return nil, err
+	}
+	frag.ID = res.InsertedID.(primitive.ObjectID)
+	return frag, nil
 }
 
 // SelectByURL Documentの取得

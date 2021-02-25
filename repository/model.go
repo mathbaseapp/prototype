@@ -4,8 +4,8 @@ import "go.mongodb.org/mongo-driver/bson/primitive"
 
 // Index index
 type Index struct {
-	Key        string `key`
-	FragmentID primitive.ObjectID
+	Key        string             `key`
+	FragmentID primitive.ObjectID `fragment_id`
 }
 
 // Fragment ページ内の数式
