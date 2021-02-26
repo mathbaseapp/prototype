@@ -66,8 +66,8 @@ func Crawle() {
 
 }
 
-var inlineReg = regexp.MustCompile(`[^\$]*\$([^\$]+)\$`) // $ ~ $ で囲まれる箇所
-var displayReg = regexp.MustCompile(`\$\$([^\$]+)\$\$`)  // $$ ~ $$ で囲まれる箇所
+var inlineReg = regexp.MustCompile(`([^\$]\$|^\$)([^\$]+)\$`) // $ ~ $ で囲まれる箇所
+var displayReg = regexp.MustCompile(`\$\$([^\$]+)\$\$`)       // $$ ~ $$ で囲まれる箇所
 
 func getTex(body string) [][]string {
 	var texs [][]string
@@ -94,7 +94,7 @@ func getTex(body string) [][]string {
 		// $ ~ $ で囲まれる部分
 		if matches := inlineReg.FindAllStringSubmatch(line, -1); len(matches) > 1 {
 			for _, match := range matches {
-				texs = append(texs, match[1:])
+				texs = append(texs, match[2:])
 			}
 		}
 
