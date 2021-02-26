@@ -29,6 +29,7 @@ func Crawle() {
 
 	for _, tag := range TAGS {
 		for i := 1; i <= 100; i++ {
+			fmt.Printf("\n\n%s\t%dページ目", tag, i)
 			time.Sleep(time.Second * 5) // 1時間に1000回のアクセス制限に引っかからないよう止める
 			page := strconv.Itoa(i)
 
@@ -53,9 +54,13 @@ func Crawle() {
 				log.Fatal(err)
 			}
 
+			if len(articles) == 0 {
+				break
+			}
+
 			for _, item := range articles {
 				if idMap[item.ID] {
-					break
+					continue
 				}
 				idMap[item.ID] = true
 				texs := getTex(item.Body)
