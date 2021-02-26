@@ -12,22 +12,24 @@ import (
 	"time"
 )
 
+// Article qiita の記事の情報を格納する
 type Article struct {
 	Title     string    `json:"title"`
 	CreatedAt time.Time `json:"created_at"`
 	Body      string    `json:"body"`
 }
 
+// Crawle クロールを実行
 func Crawle() {
 	accessToken := "04955c64db710699566b3420e4a8ae01ec907dd6"
-	per_page := "100" // 1ページあたりの記事数 1~100の間
+	perPage := "100" // 1ページあたりの記事数 1~100の間
 
 	for _, tag := range TAGS {
 		for i := 1; i <= 100; i++ {
 			time.Sleep(time.Second * 5) // 1時間に1000回のアクセス制限に引っかからないよう止める
 			page := strconv.Itoa(i)
 
-			url := "http://qiita.com/api/v2/tags/" + tag + "/items?per_page=" + per_page + "&page=" + page
+			url := "http://qiita.com/api/v2/tags/" + tag + "/items?per_page=" + perPage + "&page=" + page
 			req, _ := http.NewRequest("GET", url, nil)
 			req.Header.Set("Authorization", "Bearer "+accessToken)
 
@@ -74,6 +76,8 @@ func getTex(body string) [][]string {
 
 	lines := strings.Split(body, "\n")
 	for _, line := range lines {
+		line = strings.TrimSpace(line)
+
 		// ```math ~~ ``` で囲まれる部分を一行ずつのスライスにしてtexに格納する
 		if mathFlg && line == "```" {
 			mathFlg = false
