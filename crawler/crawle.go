@@ -17,12 +17,15 @@ type Article struct {
 	Title     string    `json:"title"`
 	CreatedAt time.Time `json:"created_at"`
 	Body      string    `json:"body"`
+	ID        string    `json:"id"`
 }
 
 // Crawle クロールを実行
 func Crawle() {
 	accessToken := "04955c64db710699566b3420e4a8ae01ec907dd6"
 	perPage := "100" // 1ページあたりの記事数 1~100の間
+
+	idMap := make(map[string]bool) // アクセスした記事のidを記録しておく
 
 	for _, tag := range TAGS {
 		for i := 1; i <= 100; i++ {
@@ -51,6 +54,10 @@ func Crawle() {
 			}
 
 			for _, item := range articles {
+				if idMap[item.ID] {
+					break
+				}
+				idMap[item.ID] = true
 				texs := getTex(item.Body)
 				_ = texs
 				fmt.Printf("\n\n%s に含まれるtexコードは以下の通り\n", item.Title)
