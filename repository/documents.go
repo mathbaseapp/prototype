@@ -4,6 +4,7 @@ import (
 	"context"
 	"time"
 
+	"github.com/google/uuid"
 	"go.mongodb.org/mongo-driver/bson"
 )
 
@@ -15,17 +16,41 @@ type documents struct {
 }
 
 // InsertOne Documentの挿入
-func (c *documents) InsertOne(doc *Document) {
+func (c *documents) InsertOne(doc *Document) (*Document, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
-	c.collection().InsertOne(ctx, doc)
+	id, err := uuid.NewRandom()
+	if err != nil {
+		return nil, err
+	}
+	doc.ID = id.String()
+	_, err = c.collection().InsertOne(ctx, doc)
+	if err != nil {
+		return nil, err
+	}
+	return doc, nil
 }
 
 // SelectByURL Documentの取得
-func (c *documents) SelectByURL(URL string) *Document {
+func (c *documents) SelectByURL(URL string) (*Document, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
 	document := Document{}
-	c.collection().FindOne(ctx, bson.M{"url": URL}).Decode(&document)
-	return &document
+	err := c.collection().FindOne(ctx, bson.M{"url": URL}).Decode(&document)
+	if err != nil {
+		return nil, err
+	}
+	return &document, nil
+}
+
+// SelectByID Documentの取得
+func (c *documents) SelectByID(ID string) (*Document, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
+	document := Document{}
+	err := c.collection().FindOne(ctx, bson.M{"_id": ID}).Decode(&document)
+	if err != nil {
+		return nil, err
+	}
+	return &document, nil
 }
