@@ -8,7 +8,7 @@ import (
 )
 
 // Indexes EvalIndexesRepository
-var Indexes = &indexes{newRepo("evaluator.index")}
+var Indexes = &indexes{newColbase("evaluator.index")}
 
 type indexes struct {
 	*colbase

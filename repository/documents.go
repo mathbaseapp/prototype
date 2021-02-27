@@ -9,7 +9,7 @@ import (
 )
 
 // Documents DocumentRepository
-var Documents = &documents{newRepo("document")}
+var Documents = &documents{newColbase("document")}
 
 type documents struct {
 	*colbase
