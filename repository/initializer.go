@@ -30,7 +30,7 @@ type colbase struct {
 	colname string
 }
 
-func (c colbase) cli() *mongo.Collection {
+func (c colbase) collection() *mongo.Collection {
 	return c.client.Database(dbname).Collection(c.colname)
 }
 

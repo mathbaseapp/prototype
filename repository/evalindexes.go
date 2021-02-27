@@ -16,5 +16,5 @@ type evalIndexes struct {
 func (c *evalIndexes) InsertOne(index *Index) {
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
-	c.cli().InsertOne(ctx, index)
+	c.collection().InsertOne(ctx, index)
 }

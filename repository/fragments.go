@@ -19,7 +19,7 @@ type fragremts struct {
 func (c *fragremts) InsertOne(frag *Fragment) (*Fragment, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
-	res, err := c.cli().InsertOne(ctx, frag)
+	res, err := c.collection().InsertOne(ctx, frag)
 	if err != nil {
 		return nil, err
 	}
@@ -32,6 +32,6 @@ func (c *fragremts) SelectByID(id primitive.ObjectID) *Fragment {
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
 	frag := Fragment{}
-	c.cli().FindOne(ctx, bson.M{"_id": id}).Decode(&frag)
+	c.collection().FindOne(ctx, bson.M{"_id": id}).Decode(&frag)
 	return &frag
 }

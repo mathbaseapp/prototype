@@ -18,7 +18,7 @@ type documents struct {
 func (c *documents) InsertOne(doc *Document) {
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
-	c.cli().InsertOne(ctx, doc)
+	c.collection().InsertOne(ctx, doc)
 }
 
 // SelectByURL Documentの取得
@@ -26,6 +26,6 @@ func (c *documents) SelectByURL(URL string) *Document {
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
 	document := Document{}
-	c.cli().FindOne(ctx, bson.M{"url": URL}).Decode(&document)
+	c.collection().FindOne(ctx, bson.M{"url": URL}).Decode(&document)
 	return &document
 }
