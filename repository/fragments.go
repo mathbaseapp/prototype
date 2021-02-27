@@ -8,26 +8,18 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
-const flagcolname = "fragments"
-
 // Fragments FragmentRepository
-var Fragments = newFragments()
+var Fragments = &fragremts{newRepo("fragments")}
 
 type fragremts struct {
-	*db
-}
-
-func newFragments() *fragremts {
-	db := newConnection()
-	return &fragremts{db}
+	*colbase
 }
 
 // InsertOne Documentの挿入
-func (d *fragremts) InsertOne(frag *Fragment) (*Fragment, error) {
+func (c *fragremts) InsertOne(frag *Fragment) (*Fragment, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
-	collection := d.collectionOf(flagcolname)
-	res, err := collection.InsertOne(ctx, frag)
+	res, err := c.cli().InsertOne(ctx, frag)
 	if err != nil {
 		return nil, err
 	}
@@ -36,11 +28,10 @@ func (d *fragremts) InsertOne(frag *Fragment) (*Fragment, error) {
 }
 
 // SelectByURL Documentの取得
-func (d *fragremts) SelectByID(id primitive.ObjectID) *Fragment {
+func (c *fragremts) SelectByID(id primitive.ObjectID) *Fragment {
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
-	collection := d.collectionOf(flagcolname)
 	frag := Fragment{}
-	collection.FindOne(ctx, bson.M{"_id": id}).Decode(&frag)
+	c.cli().FindOne(ctx, bson.M{"_id": id}).Decode(&frag)
 	return &frag
 }

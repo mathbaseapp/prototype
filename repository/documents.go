@@ -7,34 +7,25 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 )
 
-const doccolname = "document"
-
 // Documents DocumentRepository
-var Documents = newDocuments()
+var Documents = &documents{newRepo("document")}
 
 type documents struct {
-	*db
-}
-
-func newDocuments() *documents {
-	db := newConnection()
-	return &documents{db}
+	*colbase
 }
 
 // InsertOne Documentの挿入
-func (d *documents) InsertOne(doc *Document) {
+func (c *documents) InsertOne(doc *Document) {
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
-	collection := d.collectionOf(doccolname)
-	collection.InsertOne(ctx, doc)
+	c.cli().InsertOne(ctx, doc)
 }
 
 // SelectByURL Documentの取得
-func (d *documents) SelectByURL(URL string) *Document {
+func (c *documents) SelectByURL(URL string) *Document {
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
-	collection := d.collectionOf(doccolname)
 	document := Document{}
-	collection.FindOne(ctx, bson.M{"url": URL}).Decode(&document)
+	c.cli().FindOne(ctx, bson.M{"url": URL}).Decode(&document)
 	return &document
 }

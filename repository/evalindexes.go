@@ -5,24 +5,16 @@ import (
 	"time"
 )
 
-const evalindexcolname = "evaluator.index"
-
 // EvalIndexes EvalIndexesRepository
-var EvalIndexes = newEvalIndexes()
+var EvalIndexes = &evalIndexes{newRepo("evaluator.index")}
 
 type evalIndexes struct {
-	*db
-}
-
-func newEvalIndexes() *evalIndexes {
-	db := newConnection()
-	return &evalIndexes{db}
+	*colbase
 }
 
 // InsertOne Indexの挿入
-func (d *evalIndexes) InsertOne(index *Index) {
+func (c *evalIndexes) InsertOne(index *Index) {
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
-	collection := d.collectionOf(evalindexcolname)
-	collection.InsertOne(ctx, index)
+	c.cli().InsertOne(ctx, index)
 }
