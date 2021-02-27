@@ -34,6 +34,6 @@ func (c colbase) collection() *mongo.Collection {
 	return c.client.Database(dbname).Collection(c.colname)
 }
 
-func newRepo(colname string) *colbase {
+func newColbase(colname string) *colbase {
 	return &colbase{client: client, colname: colname}
 }
