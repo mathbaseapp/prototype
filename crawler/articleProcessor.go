@@ -6,22 +6,6 @@ import (
 	"strings"
 )
 
-type formula struct {
-	startLine  int // 何行目に現れたか
-	lineLength int // 何行続いたか
-	value      []string
-}
-
-func (f *formula) getInfo() string {
-	var str string
-	str += fmt.Sprintf("startLine: %d\t", f.startLine)
-	str += fmt.Sprintf("lineLength: %d\n", f.lineLength)
-	for _, v := range f.value {
-		str += fmt.Sprintf("\t%s\n", v)
-	}
-	return str
-}
-
 // 一つのページの処理に責任を持つ
 type articleProcessorInterface interface {
 	drainFormula(article) []formula
