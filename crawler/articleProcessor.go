@@ -66,21 +66,21 @@ func (q *QiitaArticleProcessor) drainFormula(article article) []formula {
 		if line == "```math" {
 			tmp = *&formula{}
 			tmp.startLine = index
-			tmp.lineLength = 1
+			tmp.lineLength = 0
 			mathFlg = true
 		}
 
 		// $ ~ $ で囲まれる部分
 		if matches := inlineReg.FindAllStringSubmatch(line, -1); len(matches) > 1 {
 			for _, match := range matches {
-				formulas = append(formulas, *&formula{startLine: index, value: match[2:]})
+				formulas = append(formulas, *&formula{startLine: index, value: match[2:], lineLength: 1})
 			}
 		}
 
 		// $$ ~ $$ で囲まれる部分
 		if matches := displayReg.FindAllStringSubmatch(line, -1); len(matches) > 1 {
 			for _, match := range matches {
-				formulas = append(formulas, *&formula{startLine: index, value: match[1:]})
+				formulas = append(formulas, *&formula{startLine: index, value: match[1:], lineLength: 1})
 			}
 		}
 	}
