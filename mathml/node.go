@@ -1,5 +1,7 @@
 package mathml
 
+import "prototype.mathbase.app/middlelng"
+
 // MarkupStyle マークアップの表現方法を示します
 type MarkupStyle string
 
@@ -10,11 +12,6 @@ const (
 	Content = MarkupStyle("Content")
 )
 
-// MiddleLanguage 中間言語を表す
-type MiddleLanguage interface {
-	Map(callback func(MiddleLanguage) interface{}) []interface{}
-}
-
 // Node MathMLにおけるNodeを表現します
 type Node struct {
 	Name     string
@@ -24,7 +21,7 @@ type Node struct {
 }
 
 // Map 下にある全てのノードについてcallbackを実行し結果をsliceで返す
-func (n *Node) Map(callback func(MiddleLanguage) interface{}) []interface{} {
+func (n *Node) Map(callback func(middlelng.MiddleLanguage) interface{}) []interface{} {
 	slice := make([]interface{}, 0)
 	slice = append(slice, callback(n))
 	for _, child := range n.Children {
