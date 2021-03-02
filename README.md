@@ -17,3 +17,15 @@ $ docker-compose up -d
 ```
 $ docker-compose down
 ```
+
+### 使い方
+#### サーバーの起動
+```
+$ go run main.go
+``` 
+#### クロールの開始
+```
+$ go run main.go -mode=crawle
+```
+
+

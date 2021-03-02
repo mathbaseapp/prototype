@@ -8,7 +8,6 @@ import (
 )
 
 func main() {
-	// usage: go run main.go -mode=crawle
 	mode := flag.String("mode", "server", "represents mode which program will be started in. server or crawl is available. default is server.")
 	flag.Parse()
 
