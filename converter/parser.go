@@ -2,6 +2,7 @@ package converter
 
 import (
 	"encoding/xml"
+	"errors"
 	"os/exec"
 
 	"prototype.mathbase.app/mathml"
@@ -34,11 +35,12 @@ func (latexParser) Parse(source string) (ParseResult, error) {
 	pandocCmd := "echo '$$" + source + "$$'  | pandoc -f html+tex_math_dollars -t html --mathml"
 	out, err := exec.Command("sh", "-c", pandocCmd).Output()
 	if err != nil {
-		panic("pandoc cannot execute. is not installed?") // TODO エラーハンドリング
+		return ParseResult{}, errors.New("pandoc の実行時にエラーが発生しました")
 	}
 	node := xmlNode{}
 	xml.Unmarshal(out, &node)
-	return ParseResult{Source: source, Node: mathMLFactory(&node)}, nil
+	mm, _ := mathMLFactory(&node)
+	return ParseResult{Source: source, Node: mm}, nil
 }
 
 type mathmlParser struct{}
@@ -48,7 +50,8 @@ func (mathmlParser) Parse(source string) (ParseResult, error) {
 	bsource := []byte(source)
 	node := xmlNode{}
 	xml.Unmarshal(bsource, &node)
-	return ParseResult{Source: source, Node: mathMLFactory(&node)}, nil
+	mm, _ := mathMLFactory(&node)
+	return ParseResult{Source: source, Node: mm}, nil
 }
 
 // GetParser 適切なコンテンツパーサーを返却します
