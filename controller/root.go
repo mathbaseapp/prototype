@@ -54,9 +54,10 @@ func restQueryByTex(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"error": err.Error(),
 		})
+	} else {
+		c.JSON(http.StatusOK, gin.H{
+			"results": results,
+			"query":   queryStr,
+		})
 	}
-	c.JSON(http.StatusOK, gin.H{
-		"results": results,
-		"query":   queryStr,
-	})
 }
