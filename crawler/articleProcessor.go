@@ -28,7 +28,7 @@ type QiitaArticleProcessor struct {
 
 func (q *QiitaArticleProcessor) process(article article) error {
 
-	doc := &repository.Document{URL: article.URL, Title: article.Title, Content: "hoge"}
+	doc := &repository.Document{URL: article.URL, Title: article.Title, Content: article.Body}
 	doc, err := repository.Documents.InsertOne(doc)
 	if err != nil {
 		fmt.Println(err)
@@ -53,10 +53,6 @@ func (q *QiitaArticleProcessor) process(article article) error {
 				continue
 			}
 			for _, token := range tokens {
-				if token == "<></>" {
-					//TODO: parse した後にres.Nodeに何も入ってない場合に起こる。parse側でerrを返してcontinueするのがベター
-					continue
-				}
 				index := &repository.Index{Key: token, Location: strconv.Itoa(formula.startLine), Document: repository.IndexDocument{ID: doc.ID, URL: doc.URL, Title: doc.Title}}
 				index, err = repository.Indexes.InsertOne(index)
 				if err != nil {
@@ -65,9 +61,7 @@ func (q *QiitaArticleProcessor) process(article article) error {
 				fmt.Println(token)
 			}
 			fmt.Println("")
-			// fmt.Println(mathml.Printer(res.Node))
 		}
-		// fmt.Println(formula.getInfo())
 	}
 	return nil
 }
