@@ -24,9 +24,24 @@ type articleProcessorInterface interface {
 type QiitaArticleProcessor struct {
 	Parser    converter.Parser
 	Tokenizer tokenizer.Tokenizer
+	util
+}
+
+// すでに保存されているページかどうかの確認など、複数のarticleProcessorで共通しそうな処理を持つ
+type util struct {
+}
+
+// 保存済みの記事ならtrue まだならfalse
+func (u *util) checkAlreadyStored(article article) bool {
+	_, err := repository.Documents.SelectByURL(article.URL)
+	return err == nil
 }
 
 func (q *QiitaArticleProcessor) process(article article) error {
+
+	if q.checkAlreadyStored(article) {
+		return errors.New("すでに保存されている記事です")
+	}
 
 	doc := &repository.Document{URL: article.URL, Title: article.Title, Content: article.Body}
 	doc, err := repository.Documents.InsertOne(doc)
@@ -58,9 +73,7 @@ func (q *QiitaArticleProcessor) process(article article) error {
 				if err != nil {
 					fmt.Println("index の保存時にエラーが発生しました")
 				}
-				fmt.Println(token)
 			}
-			fmt.Println("")
 		}
 	}
 	return nil

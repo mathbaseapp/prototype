@@ -10,7 +10,7 @@ import (
 )
 
 func main() {
-	mode := flag.String("mode", "server", "represents mode in which program will be started. server or crawl is available. default is server.")
+	mode := flag.String("mode", "server", "represents mode in which program will be started. server or crawle is available. default is server.")
 	flag.Parse()
 
 	switch *mode {
