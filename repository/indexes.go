@@ -60,7 +60,7 @@ func (c *indexes) SelectIndex(keys []string) ([]*IndexResult, error) {
 		return nil, err
 	}
 	results := []*IndexResult{}
-	err = csr.All(ctx, results)
+	err = csr.All(ctx, &results)
 	if err != nil {
 		return nil, err
 	}

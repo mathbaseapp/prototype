@@ -30,7 +30,7 @@ func queryByTex(c *gin.Context) {
 	queryStr := c.DefaultQuery("query", "")
 	results, err := service.QueryByLatex(queryStr)
 	if err != nil {
-		panic("unhandle err!")
+		panic(err)
 	}
 	c.HTML(http.StatusOK, "search", gin.H{
 		"query":   queryStr,
