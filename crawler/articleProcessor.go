@@ -1,9 +1,17 @@
 package crawler
 
 import (
+	"errors"
 	"fmt"
 	"regexp"
+	"strconv"
 	"strings"
+
+	"prototype.mathbase.app/repository"
+
+	"prototype.mathbase.app/tokenizer"
+
+	"prototype.mathbase.app/converter"
 )
 
 // 一つのページの処理に責任を持つ
@@ -14,12 +22,52 @@ type articleProcessorInterface interface {
 
 // QiitaArticleProcessor qiitaの記事を処理する
 type QiitaArticleProcessor struct {
+	Parser    converter.Parser
+	Tokenizer tokenizer.Tokenizer
 }
 
 func (q *QiitaArticleProcessor) process(article article) error {
+
+	doc := &repository.Document{URL: article.URL, Title: article.Title, Content: "hoge"}
+	doc, err := repository.Documents.InsertOne(doc)
+	if err != nil {
+		fmt.Println(err)
+		return errors.New("ページの保存に失敗しました")
+	}
+
 	formulas := q.drainFormula(article)
 	for _, formula := range formulas {
-		fmt.Println(formula.getInfo())
+		if formula.lineLength == 1 {
+			res, err := q.Parser.Parse(formula.value[0])
+			if err != nil {
+				fmt.Println(err)
+				fmt.Println("以下のformulaのパースに失敗しました")
+				fmt.Println(formula.getInfo())
+				continue
+			}
+
+			tokens, err := q.Tokenizer.Tokenize(res.Node)
+			if err != nil {
+				fmt.Println(err)
+				fmt.Println("formulaのtokenizeに失敗しました")
+				continue
+			}
+			for _, token := range tokens {
+				if token == "<></>" {
+					//TODO: parse した後にres.Nodeに何も入ってない場合に起こる。parse側でerrを返してcontinueするのがベター
+					continue
+				}
+				index := &repository.Index{Key: token, Location: strconv.Itoa(formula.startLine), Document: repository.IndexDocument{ID: doc.ID, URL: doc.URL, Title: doc.Title}}
+				index, err = repository.Indexes.InsertOne(index)
+				if err != nil {
+					fmt.Println("index の保存時にエラーが発生しました")
+				}
+				fmt.Println(token)
+			}
+			fmt.Println("")
+			// fmt.Println(mathml.Printer(res.Node))
+		}
+		// fmt.Println(formula.getInfo())
 	}
 	return nil
 }
