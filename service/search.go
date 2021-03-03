@@ -30,7 +30,7 @@ func QueryByLatex(query string) ([]*response.Document, error) {
 		alltoken = append(alltoken, tokens...)
 	}
 
-	indexes, err := repository.Indexes.SelectIndex(alltoken)
+	indexes, err := repository.Indexes.SelectSortedIndexes(alltoken)
 	if err != nil {
 		return nil, err
 	}

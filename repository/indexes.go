@@ -31,7 +31,7 @@ func (c *indexes) InsertOne(index *Index) (*Index, error) {
 	return index, nil
 }
 
-func (c *indexes) SelectIndex(keys []string) ([]*IndexResult, error) {
+func (c *indexes) SelectSortedIndexes(keys []string) ([]*IndexResult, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
 	pipeline := []bson.M{
