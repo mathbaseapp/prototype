@@ -40,8 +40,4 @@ func QueryByLatex(query string) ([]*response.Document, error) {
 		documents = append(documents, &response.Document{Title: index.Title, URL: index.URL})
 	}
 	return documents, nil
-	// return []*response.Document{
-	// 	{Title: "gyutaのぶろぐ", URL: "https://mathbase.app"},
-	// 	{Title: "ギューたのぶろぐ", URL: "https://mathbase.app"},
-	// }, nil
 }
