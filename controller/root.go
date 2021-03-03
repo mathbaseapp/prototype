@@ -5,6 +5,7 @@ import (
 
 	"github.com/gin-contrib/multitemplate"
 	"github.com/gin-gonic/gin"
+	"prototype.mathbase.app/service"
 )
 
 // RunServer サーバーを立ち上げる
@@ -26,11 +27,11 @@ func index(c *gin.Context) {
 }
 
 func queryByTex(c *gin.Context) {
-	results := []PageResult{
-		PageResult{"qiita-home1", "https://qiita.com"},
-		PageResult{"qiita-home2", "https://qiita.com"},
-	}
 	queryStr := c.DefaultQuery("query", "")
+	results, err := service.QueryByLatex(queryStr)
+	if err != nil {
+		panic(err)
+	}
 	c.HTML(http.StatusOK, "search", gin.H{
 		"query":   queryStr,
 		"results": results,
