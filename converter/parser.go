@@ -46,7 +46,11 @@ func (l *latexParser) Parse(source string) (*ParseResult, error) {
 	if err != nil {
 		return nil, err
 	}
-	return &ParseResult{Source: source, Node: mathMLFactory(node)}, nil
+	mm, err := mathMLFactory(node)
+	if err != nil {
+		return nil, err
+	}
+	return &ParseResult{Source: source, Node: mm}, nil
 }
 
 func (latexParser) panicIfNoDependency() {
@@ -62,7 +66,11 @@ func (mathmlParser) Parse(source string) (*ParseResult, error) {
 	bsource := []byte(source)
 	node := xmlNode{}
 	xml.Unmarshal(bsource, &node)
-	return &ParseResult{Source: source, Node: mathMLFactory(&node)}, nil
+	mm, err := mathMLFactory(&node)
+	if err != nil {
+		return nil, err
+	}
+	return &ParseResult{Source: source, Node: mm}, nil
 }
 
 // GetParser 適切なコンテンツパーサーを返却します
@@ -72,7 +80,7 @@ func GetParser(docType DocumentType) Parser {
 	case Latex:
 		return &latexParser{}
 	case MathML:
-		return mathmlParser{}
+		return &mathmlParser{}
 	default:
 		panic("incorrect document type.")
 	}
