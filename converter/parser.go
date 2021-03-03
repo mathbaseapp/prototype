@@ -26,32 +26,38 @@ const (
 
 // Parser MathMLに変換するためのパーサーを定義します
 type Parser interface {
-	Parse(string) (ParseResult, error)
+	Parse(string) (*ParseResult, error)
 }
 
 type latexParser struct{}
 
-func (latexParser) Parse(source string) (ParseResult, error) {
+func (latexParser) Parse(source string) (*ParseResult, error) {
 	pandocCmd := "echo '$$" + source + "$$'  | pandoc -f html+tex_math_dollars -t html --mathml"
 	out, err := exec.Command("sh", "-c", pandocCmd).Output()
 	if err != nil {
-		return ParseResult{}, errors.New("pandoc の実行時にエラーが発生しました")
+		return nil, errors.New("pandoc の実行時にエラーが発生しました")
 	}
 	node := xmlNode{}
 	xml.Unmarshal(out, &node)
-	mm, _ := mathMLFactory(&node)
-	return ParseResult{Source: source, Node: mm}, nil
+	mm, err := mathMLFactory(&node)
+	if err != nil {
+		return nil, err
+	}
+	return &ParseResult{Source: source, Node: mm}, nil
 }
 
 type mathmlParser struct{}
 
-func (mathmlParser) Parse(source string) (ParseResult, error) {
+func (mathmlParser) Parse(source string) (*ParseResult, error) {
 
 	bsource := []byte(source)
 	node := xmlNode{}
 	xml.Unmarshal(bsource, &node)
-	mm, _ := mathMLFactory(&node)
-	return ParseResult{Source: source, Node: mm}, nil
+	mm, err := mathMLFactory(&node)
+	if err != nil {
+		return nil, err
+	}
+	return &ParseResult{Source: source, Node: mm}, nil
 }
 
 // GetParser 適切なコンテンツパーサーを返却します
@@ -59,9 +65,9 @@ func GetParser(docType DocumentType) Parser {
 
 	switch docType {
 	case Latex:
-		return latexParser{}
+		return &latexParser{}
 	case MathML:
-		return mathmlParser{}
+		return &mathmlParser{}
 	default:
 		panic("incorrect document type.")
 	}
