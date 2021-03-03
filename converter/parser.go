@@ -2,8 +2,8 @@ package converter
 
 import (
 	"encoding/xml"
-	"errors"
 	"os/exec"
+	"regexp"
 
 	"prototype.mathbase.app/mathml"
 )
@@ -29,21 +29,34 @@ type Parser interface {
 	Parse(string) (*ParseResult, error)
 }
 
+var noutf8 = regexp.MustCompile(`&.*;`) // non-greedy
+
 type latexParser struct{}
 
-func (latexParser) Parse(source string) (*ParseResult, error) {
+func (l *latexParser) Parse(source string) (*ParseResult, error) {
+	l.panicIfNoDependency()
 	pandocCmd := "echo '$$" + source + "$$'  | pandoc -f html+tex_math_dollars -t html --mathml"
 	out, err := exec.Command("sh", "-c", pandocCmd).Output()
 	if err != nil {
-		return nil, errors.New("pandoc の実行時にエラーが発生しました")
+		return nil, err
 	}
-	node := xmlNode{}
-	xml.Unmarshal(out, &node)
-	mm, err := mathMLFactory(&node)
+	uxml := noutf8.ReplaceAllString(string(out), "") // utf-8に含まれない文字/実体参照を削除
+	node := &xmlNode{}
+	err = xml.Unmarshal([]byte(uxml), node)
+	if err != nil {
+		return nil, err
+	}
+	mm, err := mathMLFactory(node)
 	if err != nil {
 		return nil, err
 	}
 	return &ParseResult{Source: source, Node: mm}, nil
+}
+
+func (latexParser) panicIfNoDependency() {
+	if _, err := exec.Command("pandoc", "-v").Output(); err != nil {
+		panic("pandoc cannot execute. is not installed?")
+	}
 }
 
 type mathmlParser struct{}
