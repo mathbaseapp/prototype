@@ -44,7 +44,7 @@ func (c *Crawler) Crawle() ([]Article, error) {
 
 	if err != nil {
 		fmt.Println(err)
-		fmt.Printf("現在のCrawlerの状態は以下の通りです\n%#v", c)
+		fmt.Printf("currentTag: %s\tcurrentTagIndex: %d\tcurrentPageIndex: %d\n", TAGS[c.currentTagIndex], c.currentTagIndex, c.currentPageIndex)
 		c.goNextPage()
 		return nil, err
 	}
