@@ -1,13 +1,11 @@
 package service
 
 import (
-	"errors"
 	"fmt"
 	"regexp"
 	"strconv"
 	"strings"
 
-	"prototype.mathbase.app/crawler"
 	"prototype.mathbase.app/repository"
 
 	"prototype.mathbase.app/tokenizer"
@@ -41,42 +39,23 @@ func (f *formula) getValueInOneLine() string {
 
 // 一つのページの処理に責任を持つ
 type articleProcessorInterface interface {
-	drainFormula(crawler.Article) []formula
-	Process(crawler.Article) error
+	drainFormula(repository.Document) []formula
+	Process(repository.Document) error
 }
 
 // QiitaArticleProcessor qiitaの記事を処理する
 type QiitaArticleProcessor struct {
 	Parser    converter.Parser
 	Tokenizer tokenizer.Tokenizer
-	util
-}
-
-// すでに保存されているページかどうかの確認など、複数のarticleProcessorで共通しそうな処理を持つ
-type util struct {
-}
-
-// 保存済みの記事ならtrue まだならfalse
-func (u *util) checkAlreadyStored(article crawler.Article) bool {
-	_, err := repository.Documents.SelectByURL(article.URL)
-	return err == nil
 }
 
 // Process 記事を処理する
-func (q *QiitaArticleProcessor) Process(article crawler.Article) error {
-
-	if q.checkAlreadyStored(article) {
-		return errors.New("すでに保存されている記事です")
+func (q *QiitaArticleProcessor) Process(document repository.Document) error {
+	if repository.Indexes.SelectByIndexDocument(document) != nil {
+		return erros.New("すでにトークナイズが実行された記事です")
 	}
 
-	doc := &repository.Document{URL: article.URL, Title: article.Title, Content: article.Body}
-	doc, err := repository.Documents.InsertOne(doc)
-	if err != nil {
-		fmt.Println(err)
-		return errors.New("ページの保存に失敗しました")
-	}
-
-	formulas := q.drainFormula(article)
+	formulas := q.drainFormula(document)
 	for _, formula := range formulas {
 		expr := formula.getValueInOneLine()
 		res, err := q.Parser.Parse(expr)
@@ -108,11 +87,11 @@ func (q *QiitaArticleProcessor) Process(article crawler.Article) error {
 var inlineReg = regexp.MustCompile(`([^\$]\$|^\$)([^\$]+)\$`) // $ ~ $ で囲まれる箇所
 var displayReg = regexp.MustCompile(`\$\$([^\$]+)\$\$`)       // $$ ~ $$ で囲まれる箇所
 
-func (q *QiitaArticleProcessor) drainFormula(article crawler.Article) []formula {
+func (q *QiitaArticleProcessor) drainFormula(document repository.Document) []formula {
 	var tmp formula
 	var formulas []formula
 
-	body := article.Body
+	body := document.Body
 	mathFlg := false
 
 	lines := strings.Split(body, "\n")
