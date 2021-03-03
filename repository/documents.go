@@ -66,19 +66,15 @@ func (c *documents) StreamEveryDocument(callback func(Document) error) error {
 	}
 	defer cur.Close(ctx)
 	for cur.Next(ctx) {
-		var documents []Document
-		err := cur.Decode(&documents)
+		var document *Document
+		err := cur.Decode(&document)
 		if err != nil {
 			return err
 		}
-
-		for _, doc := range documents {
-			err := callback(doc)
-			if err != nil {
-				fmt.Println(err)
-			}
+		err = callback(*document)
+		if err != nil {
+			fmt.Println(err)
 		}
-
 	}
 	if err := cur.Err(); err != nil {
 		return err

@@ -1,6 +1,7 @@
 package service
 
 import (
+	"errors"
 	"fmt"
 	"regexp"
 	"strconv"
@@ -51,8 +52,9 @@ type QiitaArticleProcessor struct {
 
 // Process 記事を処理する
 func (q *QiitaArticleProcessor) Process(document repository.Document) error {
-	if repository.Indexes.SelectByIndexDocument(document) != nil {
-		return erros.New("すでにトークナイズが実行された記事です")
+	indexDocument := repository.IndexDocument{ID: document.ID, URL: document.URL, Title: document.Title}
+	if index, _ := repository.Indexes.SelectByIndexDocument(indexDocument); index != nil {
+		return errors.New("すでにトークナイズが実行された記事です")
 	}
 
 	formulas := q.drainFormula(document)
@@ -73,7 +75,7 @@ func (q *QiitaArticleProcessor) Process(document repository.Document) error {
 			continue
 		}
 		for _, token := range tokens {
-			index := &repository.Index{Key: token, Location: strconv.Itoa(formula.startLine), Document: repository.IndexDocument{ID: doc.ID, URL: doc.URL, Title: doc.Title}}
+			index := &repository.Index{Key: token, Location: strconv.Itoa(formula.startLine), Document: indexDocument}
 			index, err = repository.Indexes.InsertOne(index)
 			if err != nil {
 				fmt.Println("index の保存時にエラーが発生しました")
@@ -91,7 +93,7 @@ func (q *QiitaArticleProcessor) drainFormula(document repository.Document) []for
 	var tmp formula
 	var formulas []formula
 
-	body := document.Body
+	body := document.Content
 	mathFlg := false
 
 	lines := strings.Split(body, "\n")
