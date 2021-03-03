@@ -16,7 +16,7 @@ func RunServer() {
 
 	// cors対応
 	config := cors.DefaultConfig()
-	config.AllowOrigins = []string{"https://mathbase.app"}
+	config.AllowOrigins = []string{"https://mathbase.app", "http://localhost:8080"}
 	engine.Use(cors.New(config))
 
 	engine.LoadHTMLGlob("template/*.html")
