@@ -20,7 +20,11 @@ func Crawle() error {
 	for !c.Done {
 
 		time.Sleep(time.Second * 5) // 1時間に1000回のアクセス制限に引っかからないよう止める
-		articles, _ := c.Crawle()
+		articles, err := c.Crawle()
+		if err != nil {
+			fmt.Println(err)
+			continue
+		}
 		for _, article := range articles {
 			err := processor.Process(article)
 			if err != nil {
