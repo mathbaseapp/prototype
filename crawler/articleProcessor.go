@@ -52,29 +52,29 @@ func (q *QiitaArticleProcessor) process(article article) error {
 
 	formulas := q.drainFormula(article)
 	for _, formula := range formulas {
-		if formula.lineLength == 1 {
-			res, err := q.Parser.Parse(formula.value[0])
-			if err != nil {
-				fmt.Println(err)
-				fmt.Println("以下のformulaのパースに失敗しました")
-				fmt.Println(formula.getInfo())
-				continue
-			}
+		expr := formula.getValueInOneLine()
+		res, err := q.Parser.Parse(expr)
+		if err != nil {
+			fmt.Println(err)
+			fmt.Println("以下のformulaのパースに失敗しました")
+			fmt.Println(formula.getInfo())
+			continue
+		}
 
-			tokens, err := q.Tokenizer.Tokenize(res.Node)
+		tokens, err := q.Tokenizer.Tokenize(res.Node)
+		if err != nil {
+			fmt.Println(err)
+			fmt.Println("formulaのtokenizeに失敗しました")
+			continue
+		}
+		for _, token := range tokens {
+			index := &repository.Index{Key: token, Location: strconv.Itoa(formula.startLine), Document: repository.IndexDocument{ID: doc.ID, URL: doc.URL, Title: doc.Title}}
+			index, err = repository.Indexes.InsertOne(index)
 			if err != nil {
-				fmt.Println(err)
-				fmt.Println("formulaのtokenizeに失敗しました")
-				continue
-			}
-			for _, token := range tokens {
-				index := &repository.Index{Key: token, Location: strconv.Itoa(formula.startLine), Document: repository.IndexDocument{ID: doc.ID, URL: doc.URL, Title: doc.Title}}
-				index, err = repository.Indexes.InsertOne(index)
-				if err != nil {
-					fmt.Println("index の保存時にエラーが発生しました")
-				}
+				fmt.Println("index の保存時にエラーが発生しました")
 			}
 		}
+
 	}
 	return nil
 }

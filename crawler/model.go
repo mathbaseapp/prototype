@@ -28,3 +28,11 @@ func (f *formula) getInfo() string {
 	}
 	return str
 }
+
+func (f *formula) getValueInOneLine() string {
+	var str string
+	for _, v := range f.value {
+		str += v + "\n"
+	}
+	return str
+}
