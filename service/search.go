@@ -5,6 +5,7 @@ import (
 
 	"prototype.mathbase.app/converter"
 	"prototype.mathbase.app/model/response"
+	"prototype.mathbase.app/repository"
 	"prototype.mathbase.app/tokenizer"
 )
 
@@ -29,8 +30,18 @@ func QueryByLatex(query string) ([]*response.Document, error) {
 		alltoken = append(alltoken, tokens...)
 	}
 
-	return []*response.Document{
-		{Title: "gyutaのぶろぐ", URL: "https://mathbase.app"},
-		{Title: "ギューたのぶろぐ", URL: "https://mathbase.app"},
-	}, nil
+	indexes, err := repository.Indexes.SelectIndex(alltoken)
+	if err != nil {
+		return nil, err
+	}
+
+	documents := []*response.Document{}
+	for _, index := range indexes {
+		documents = append(documents, &response.Document{Title: index.Title, URL: index.URL})
+	}
+	return documents, nil
+	// return []*response.Document{
+	// 	{Title: "gyutaのぶろぐ", URL: "https://mathbase.app"},
+	// 	{Title: "ギューたのぶろぐ", URL: "https://mathbase.app"},
+	// }, nil
 }
