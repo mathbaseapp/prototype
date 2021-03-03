@@ -1,4 +1,4 @@
-package crawler
+package service
 
 import (
 	"errors"
@@ -7,6 +7,7 @@ import (
 	"strconv"
 	"strings"
 
+	"prototype.mathbase.app/crawler"
 	"prototype.mathbase.app/repository"
 
 	"prototype.mathbase.app/tokenizer"
@@ -14,10 +15,34 @@ import (
 	"prototype.mathbase.app/converter"
 )
 
+type formula struct {
+	startLine  int // 何行目に現れたか
+	lineLength int // 何行続いたか
+	value      []string
+}
+
+func (f *formula) getInfo() string {
+	var str string
+	str += fmt.Sprintf("startLine: %d\t", f.startLine)
+	str += fmt.Sprintf("lineLength: %d\n", f.lineLength)
+	for _, v := range f.value {
+		str += fmt.Sprintf("\t%s\n", v)
+	}
+	return str
+}
+
+func (f *formula) getValueInOneLine() string {
+	var str string
+	for _, v := range f.value {
+		str += v + "\n"
+	}
+	return str
+}
+
 // 一つのページの処理に責任を持つ
 type articleProcessorInterface interface {
-	drainFormula(article) []formula
-	process(article) error
+	drainFormula(crawler.Article) []formula
+	Process(crawler.Article) error
 }
 
 // QiitaArticleProcessor qiitaの記事を処理する
@@ -32,12 +57,13 @@ type util struct {
 }
 
 // 保存済みの記事ならtrue まだならfalse
-func (u *util) checkAlreadyStored(article article) bool {
+func (u *util) checkAlreadyStored(article crawler.Article) bool {
 	_, err := repository.Documents.SelectByURL(article.URL)
 	return err == nil
 }
 
-func (q *QiitaArticleProcessor) process(article article) error {
+// Process 記事を処理する
+func (q *QiitaArticleProcessor) Process(article crawler.Article) error {
 
 	if q.checkAlreadyStored(article) {
 		return errors.New("すでに保存されている記事です")
@@ -82,7 +108,7 @@ func (q *QiitaArticleProcessor) process(article article) error {
 var inlineReg = regexp.MustCompile(`([^\$]\$|^\$)([^\$]+)\$`) // $ ~ $ で囲まれる箇所
 var displayReg = regexp.MustCompile(`\$\$([^\$]+)\$\$`)       // $$ ~ $$ で囲まれる箇所
 
-func (q *QiitaArticleProcessor) drainFormula(article article) []formula {
+func (q *QiitaArticleProcessor) drainFormula(article crawler.Article) []formula {
 	var tmp formula
 	var formulas []formula
 
