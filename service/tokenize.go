@@ -2,6 +2,7 @@ package service
 
 import (
 	"prototype.mathbase.app/converter"
+	"prototype.mathbase.app/repository"
 	"prototype.mathbase.app/tokenizer"
 )
 
@@ -12,10 +13,5 @@ func Tokenize() {
 	tokenizer := &tokenizer.MathmlTokenizer{}
 	processor := &QiitaArticleProcessor{Parser: parser, Tokenizer: tokenizer}
 
-	repository.allDocsStream(
-		func(doc) {
-			// doc を
-			
-		}
-	)
+	repository.Documents.StreamEveryDocument(processor.Process)
 }

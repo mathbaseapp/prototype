@@ -2,6 +2,7 @@ package repository
 
 import (
 	"context"
+	"fmt"
 	"time"
 
 	"github.com/google/uuid"
@@ -53,4 +54,34 @@ func (c *documents) SelectByID(ID string) (*Document, error) {
 		return nil, err
 	}
 	return &document, nil
+}
+
+// StreamAllDocument
+func (c *documents) StreamEveryDocument(callback func(Document) error) error {
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
+	cur, err := c.collection().Find(ctx, bson.D{})
+	if err != nil {
+		return err
+	}
+	defer cur.Close(ctx)
+	for cur.Next(ctx) {
+		var documents []Document
+		err := cur.Decode(&documents)
+		if err != nil {
+			return err
+		}
+
+		for _, doc := range documents {
+			err := callback(doc)
+			if err != nil {
+				fmt.Println(err)
+			}
+		}
+
+	}
+	if err := cur.Err(); err != nil {
+		return err
+	}
+	return nil
 }
