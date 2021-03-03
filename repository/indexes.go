@@ -31,16 +31,16 @@ func (c *indexes) InsertOne(index *Index) (*Index, error) {
 	return index, nil
 }
 
-func (c *indexes) SelectIndex(keys []string) ([]*Index, error) {
+func (c *indexes) SelectIndex(keys []string) ([]*IndexResult, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
 	pipeline := []bson.M{
-		bson.M{
+		{
 			"$match": bson.M{
 				"key": bson.M{"$in": keys},
 			},
 		},
-		bson.M{
+		{
 			"$group": bson.M{
 				"_id":      "$document.url",
 				"title":    bson.M{"$first": "$document.title"},
@@ -48,12 +48,21 @@ func (c *indexes) SelectIndex(keys []string) ([]*Index, error) {
 				"count":    bson.M{"$sum": 1},
 			},
 		},
-		bson.M{
+		{
 			"$sort": bson.M{"count": -1},
 		},
-		bson.M{
+		{
 			"$limit": 30,
 		},
 	}
-	c.collection().Aggregate(ctx, pipeline)
+	csr, err := c.collection().Aggregate(ctx, pipeline)
+	if err != nil {
+		return nil, err
+	}
+	results := []*IndexResult{}
+	err = csr.All(ctx, results)
+	if err != nil {
+		return nil, err
+	}
+	return results, nil
 }
