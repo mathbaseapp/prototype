@@ -5,6 +5,7 @@ import (
 	"os/exec"
 	"regexp"
 
+	"github.com/mattn/go-pipeline"
 	"prototype.mathbase.app/mathml"
 )
 
@@ -30,17 +31,21 @@ type Parser interface {
 }
 
 var noutf8 = regexp.MustCompile(`&.*;`) // non-greedy
+var annotation = regexp.MustCompile(`<annotation .*</annotation>`)
 
 type latexParser struct{}
 
 func (l *latexParser) Parse(source string) (*ParseResult, error) {
 	l.panicIfNoDependency()
-	pandocCmd := "echo '$$" + source + "$$'  | pandoc -f html+tex_math_dollars -t html --mathml"
-	out, err := exec.Command("sh", "-c", pandocCmd).Output()
+	out, err := pipeline.Output(
+		[]string{"echo", "'$$" + source + "$$'"},
+		[]string{"pandoc", "-f", "html+tex_math_dollars", "-t", "html", "--mathml"},
+	)
 	if err != nil {
 		return nil, err
 	}
 	uxml := noutf8.ReplaceAllString(string(out), "") // utf-8に含まれない文字/実体参照を削除
+	uxml = annotation.ReplaceAllString(uxml, "")     // <annotation/>タグを削除
 	node := &xmlNode{}
 	err = xml.Unmarshal([]byte(uxml), node)
 	if err != nil {

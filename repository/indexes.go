@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/google/uuid"
+	"go.mongodb.org/mongo-driver/bson"
 )
 
 // Indexes EvalIndexesRepository
@@ -28,4 +29,40 @@ func (c *indexes) InsertOne(index *Index) (*Index, error) {
 		return nil, err
 	}
 	return index, nil
+}
+
+func (c *indexes) SelectSortedIndexes(keys []string) ([]*IndexResult, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
+	pipeline := []bson.M{
+		{
+			"$match": bson.M{
+				"key": bson.M{"$in": keys},
+			},
+		},
+		{
+			"$group": bson.M{
+				"_id":      "$document.url",
+				"title":    bson.M{"$first": "$document.title"},
+				"location": bson.M{"$push": "$location"},
+				"count":    bson.M{"$sum": 1},
+			},
+		},
+		{
+			"$sort": bson.M{"count": -1},
+		},
+		{
+			"$limit": 30,
+		},
+	}
+	csr, err := c.collection().Aggregate(ctx, pipeline)
+	if err != nil {
+		return nil, err
+	}
+	results := []*IndexResult{}
+	err = csr.All(ctx, &results)
+	if err != nil {
+		return nil, err
+	}
+	return results, nil
 }

@@ -15,6 +15,13 @@ type IndexDocument struct {
 	Title string `title`
 }
 
+type IndexResult struct {
+	URL      string   `_id`
+	Title    string   `title`
+	Location []string `location`
+	Count    int      `count`
+}
+
 // Document qiitaのページ
 type Document struct {
 	ID      string `_id`
