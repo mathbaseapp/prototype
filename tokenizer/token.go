@@ -16,8 +16,8 @@ type MathmlTokenizer struct {
 }
 
 // Tokenize トークナイズ
-func (m *MathmlTokenizer) Tokenize(ml *mathml.Node) ([]string, error) {
-	slice := ml.Map(func(n *mathml.Node) interface{} {
+func (m *MathmlTokenizer) Tokenize(mn *mathml.Node) ([]string, error) {
+	slice := mn.Map(func(n *mathml.Node) interface{} {
 		return mathml.Printer(n)
 	})
 	res := make([]string, len(slice))
