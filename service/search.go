@@ -38,7 +38,7 @@ func QueryByLatex(query string) ([]*response.Document, error) {
 	if err != nil {
 		return nil, err
 	}
-	pp.Println(indexes[0])
+	pp.Println(indexes)
 
 	documents := []*response.Document{}
 	for _, index := range indexes {
