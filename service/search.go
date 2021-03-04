@@ -38,11 +38,12 @@ func QueryByLatex(query string) ([]*response.Document, error) {
 	if err != nil {
 		return nil, err
 	}
+
 	pp.Println(indexes[0])
 
 	documents := []*response.Document{}
 	for _, index := range indexes {
-		documents = append(documents, &response.Document{Title: index.Title, URL: index.URL})
+		documents = append(documents, &response.Document{Title: index.Title, URL: index.URL, Point: index.Eval})
 	}
 	return documents, nil
 }
