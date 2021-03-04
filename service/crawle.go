@@ -1,10 +1,10 @@
 package service
 
 import (
-	"fmt"
 	"time"
 
 	"prototype.mathbase.app/crawler"
+	"prototype.mathbase.app/lg"
 	"prototype.mathbase.app/repository"
 )
 
@@ -18,7 +18,7 @@ func Crawle() error {
 		time.Sleep(time.Second * 5) // 1時間に1000回のアクセス制限に引っかからないよう止める
 		articles, err := c.Crawle()
 		if err != nil {
-			fmt.Println(err)
+			lg.I.Println(err)
 			continue
 		}
 		for _, article := range articles {
@@ -28,8 +28,8 @@ func Crawle() error {
 			doc := &repository.Document{URL: article.URL, Title: article.Title, Content: article.Body}
 			_, err = repository.Documents.InsertOne(doc)
 			if err != nil {
-				fmt.Printf("%sの保存時にエラーが発生しました。\n", doc.URL)
-				fmt.Println(err)
+				lg.I.Printf("%sの保存時にエラーが発生しました。\n", doc.URL)
+				lg.I.Println(err)
 			}
 		}
 	}
