@@ -54,7 +54,7 @@ type QiitaArticleProcessor struct {
 	Tokenizer tokenizer.Tokenizer
 }
 
-var alphabet = regexp.MustCompile("^[a-z]$")
+var alphabet = regexp.MustCompile("^([a-z]|\\d+|\\+|\\-|=)$")
 
 // Process 記事を処理する
 func (q *QiitaArticleProcessor) Process(document repository.Document) error {
@@ -77,14 +77,13 @@ func (q *QiitaArticleProcessor) Process(document repository.Document) error {
 		for _, node := range res.Node.List() {
 			base := 1.0
 			if alphabet.MatchString(node.Value) {
-				base = 0.001
+				base = 0.0001
 			}
 			token := mathml.Printer(node)
 			indexdoc := repository.IndexDocument{ID: document.ID, URL: document.URL, Title: document.Title}
 			weight := 1.0 / float64(len(formulas)) * float64(utf8.RuneCountInString(token)) * base
 			indexes = append(indexes, &repository.Index{Key: token, Location: strconv.Itoa(formula.startLine), Document: indexdoc, Weight: weight})
 		}
-
 	}
 
 	_, err := repository.Indexes.InsertMany(indexes)
