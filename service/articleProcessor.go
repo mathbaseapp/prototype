@@ -6,6 +6,7 @@ import (
 	"regexp"
 	"strconv"
 	"strings"
+	"unicode/utf8"
 
 	"prototype.mathbase.app/repository"
 
@@ -71,7 +72,7 @@ func (q *QiitaArticleProcessor) Process(document repository.Document) error {
 		var indexes []*repository.Index
 		for _, token := range tokens {
 			indexdoc := repository.IndexDocument{ID: document.ID, URL: document.URL, Title: document.Title}
-			weight := 1.0 / float32(len(formulas))
+			weight := 1.0 / float64(len(formulas)) * float64(utf8.RuneCountInString(token))
 			indexes = append(indexes, &repository.Index{Key: token, Location: strconv.Itoa(formula.startLine), Document: indexdoc, Weight: weight})
 		}
 		_, err = repository.Indexes.InsertMany(indexes)

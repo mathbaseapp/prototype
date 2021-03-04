@@ -67,10 +67,11 @@ func (c *indexes) SelectSortedIndexes(keys []string) ([]*IndexResult, error) {
 				"title":    bson.M{"$first": "$document.title"},
 				"location": bson.M{"$push": "$location"},
 				"count":    bson.M{"$sum": 1},
+				"eval":     bson.M{"$sum": "$weight"},
 			},
 		},
 		{
-			"$sort": bson.M{"count": -1},
+			"$sort": bson.M{"eval": -1},
 		},
 		{
 			"$limit": 30,
