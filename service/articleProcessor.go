@@ -38,12 +38,6 @@ func (f *formula) getValueInOneLine() string {
 	return str
 }
 
-// 一つのページの処理に責任を持つ
-type articleProcessorInterface interface {
-	drainFormula(repository.Document) []formula
-	Process(repository.Document) error
-}
-
 // QiitaArticleProcessor qiitaの記事を処理する
 type QiitaArticleProcessor struct {
 	Parser    converter.Parser
@@ -52,8 +46,7 @@ type QiitaArticleProcessor struct {
 
 // Process 記事を処理する
 func (q *QiitaArticleProcessor) Process(document repository.Document) error {
-	indexDocument := repository.IndexDocument{ID: document.ID, URL: document.URL, Title: document.Title}
-	if index, _ := repository.Indexes.SelectByIndexDocument(indexDocument); index != nil {
+	if index, _ := repository.Indexes.SelectByID(document.ID); index != nil {
 		return errors.New("すでにトークナイズが実行された記事です")
 	}
 
@@ -74,14 +67,17 @@ func (q *QiitaArticleProcessor) Process(document repository.Document) error {
 			fmt.Println("formulaのtokenizeに失敗しました")
 			continue
 		}
-		for _, token := range tokens {
-			index := &repository.Index{Key: token, Location: strconv.Itoa(formula.startLine), Document: indexDocument}
-			index, err = repository.Indexes.InsertOne(index)
-			if err != nil {
-				fmt.Println("index の保存時にエラーが発生しました")
-			}
-		}
 
+		var indexes []*repository.Index
+		for _, token := range tokens {
+			indexdoc := repository.IndexDocument{ID: document.ID, URL: document.URL, Title: document.Title}
+			weight := 1.0 / float32(len(formulas))
+			indexes = append(indexes, &repository.Index{Key: token, Location: strconv.Itoa(formula.startLine), Document: indexdoc, Weight: weight})
+		}
+		_, err = repository.Indexes.InsertMany(indexes)
+		if err != nil {
+			fmt.Println(err)
+		}
 	}
 	return nil
 }
