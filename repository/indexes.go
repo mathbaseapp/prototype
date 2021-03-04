@@ -66,3 +66,15 @@ func (c *indexes) SelectSortedIndexes(keys []string) ([]*IndexResult, error) {
 	}
 	return results, nil
 }
+
+func (c *indexes) SelectByIndexDocument(indexDocument IndexDocument) (*Index, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
+	index := Index{}
+	err := c.collection().FindOne(ctx, bson.M{"document.id": indexDocument.ID}).Decode(&index)
+	if err != nil {
+		return nil, err
+	}
+
+	return &index, err
+}
