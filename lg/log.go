@@ -4,28 +4,29 @@ import (
 	"log"
 	"runtime"
 	"strconv"
+	"time"
 )
 
-var pri = 0
+var lev = 0
 
-// D debug log
-var D = printer{level: "debug", color: 36, pri: 0}
+// I debug log
+var I = printer{level: "info", color: 36, pri: 0}
 
-// W warning log
-var W = printer{level: "warinig", color: 33, pri: 1}
+// E warning log
+var E = printer{level: "error", color: 33, pri: 1}
 
 // F fatal log. does not panic
 var F = printer{level: "fatal", color: 31, pri: 2}
 
-// SetPri ログレベルを設定
-func SetPri(p string) {
-	switch p {
+// SetLevel ログレベルを設定
+func SetLevel(l string) {
+	switch l {
 	case "info":
-		pri = 0
+		lev = 0
 	case "error":
-		pri = 1
+		lev = 1
 	case "fatal":
-		pri = 2
+		lev = 2
 	default:
 		F.Println("log level not defined.")
 		panic("")
@@ -39,12 +40,12 @@ type printer struct {
 }
 
 func (p *printer) prefix() string {
-	return decorateColor(p.level, p.color) + " " + caller(3)
+	return decorateColor("["+p.level+"]", p.color) + " " + decorateColor(timestamp(), 34) + " " + caller(3) + "\n\t"
 }
 
 // Print Print
 func (p *printer) Print(v ...interface{}) {
-	if p.pri >= pri {
+	if p.pri >= lev {
 		v = append([]interface{}{p.prefix()}, v...)
 		log.Print(v...)
 	}
@@ -52,7 +53,7 @@ func (p *printer) Print(v ...interface{}) {
 
 // Printf Printf
 func (p *printer) Printf(format string, v ...interface{}) {
-	if p.pri >= pri {
+	if p.pri >= lev {
 		v = append([]interface{}{p.prefix()}, v...)
 		log.Printf(format, v...)
 	}
@@ -65,11 +66,19 @@ func (p *printer) Println(v ...interface{}) {
 }
 
 func decorateColor(str string, color int) string {
-	return "\x1b[" + strconv.Itoa(color) + "m[" + str + "]\x1b[0m"
+	return "\x1b[" + strconv.Itoa(color) + "m" + str + "\x1b[0m"
 }
 
 func caller(depth int) string {
 	pc, file, line, _ := runtime.Caller(depth)
 	f := runtime.FuncForPC(pc)
-	return "@" + f.Name() + " (" + file + ":" + strconv.Itoa(line) + ")"
+	return f.Name() + "() " + file + ":" + strconv.Itoa(line) + ""
+}
+
+func timestamp() string {
+	return time.Now().Format("[2006-01-02 15:04:05]")
+}
+
+func init() {
+	log.SetFlags(log.Flags() &^ (log.Ldate | log.Ltime))
 }

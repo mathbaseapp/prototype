@@ -53,7 +53,7 @@ func restQueryByTex(c *gin.Context) {
 	queryStr := c.DefaultQuery("query", "")
 	results, err := service.QueryByLatex(queryStr)
 	if err != nil {
-		lg.D.Println(err.Error())
+		lg.I.Println(err.Error())
 		c.JSON(http.StatusBadRequest, gin.H{
 			"error": err.Error(),
 		})
