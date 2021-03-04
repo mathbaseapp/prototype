@@ -4,18 +4,14 @@ import (
 	"fmt"
 	"time"
 
-	"prototype.mathbase.app/converter"
 	"prototype.mathbase.app/crawler"
-	"prototype.mathbase.app/tokenizer"
+	"prototype.mathbase.app/repository"
 )
 
 // Crawle 記事をクロール・保存する
 func Crawle() error {
 
 	token := "04955c64db710699566b3420e4a8ae01ec907dd6"
-	parser := converter.GetParser(converter.Latex)
-	tokenizer := &tokenizer.MathmlTokenizer{}
-	processor := &QiitaArticleProcessor{Parser: parser, Tokenizer: tokenizer}
 	c := crawler.NewCrawler(token)
 	for !c.Done {
 
@@ -26,11 +22,22 @@ func Crawle() error {
 			continue
 		}
 		for _, article := range articles {
-			err := processor.Process(article)
+			if checkAlreadyStored(article) {
+				continue
+			}
+			doc := &repository.Document{URL: article.URL, Title: article.Title, Content: article.Body}
+			_, err = repository.Documents.InsertOne(doc)
 			if err != nil {
+				fmt.Printf("%sの保存時にエラーが発生しました。\n", doc.URL)
 				fmt.Println(err)
 			}
 		}
 	}
 	return nil
+}
+
+// 保存済みの記事ならtrue まだならfalse
+func checkAlreadyStored(article crawler.Article) bool {
+	_, err := repository.Documents.SelectByURL(article.URL)
+	return err == nil
 }
