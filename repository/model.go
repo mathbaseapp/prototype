@@ -22,6 +22,7 @@ type IndexResult struct {
 	Location []string `location`
 	Count    int      `count`
 	Eval     float64  `eval`
+	Keys     []string `keys`
 }
 
 // Document qiitaのページ

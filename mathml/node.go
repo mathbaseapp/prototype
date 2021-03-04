@@ -21,9 +21,25 @@ type Node struct {
 // Map 下にある全てのノードについてcallbackを実行し結果をsliceで返す
 func (n *Node) Map(callback func(*Node) interface{}) []interface{} {
 	slice := make([]interface{}, 0)
-	slice = append(slice, callback(n))
-	for _, child := range n.Children {
-		slice = append(slice, child.Map(callback)...)
-	}
+	n.ForEach(func(n *Node) {
+		slice = append(slice, callback(n))
+	})
 	return slice
+}
+
+// List を取得します
+func (n *Node) List() []*Node {
+	var nodes []*Node
+	n.ForEach(func(n *Node) {
+		nodes = append(nodes, n)
+	})
+	return nodes
+}
+
+// ForEach 深さ優先で探索します
+func (n *Node) ForEach(callback func(*Node)) {
+	callback(n)
+	for _, child := range n.Children {
+		child.ForEach(callback)
+	}
 }

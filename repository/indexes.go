@@ -67,6 +67,7 @@ func (c *indexes) SelectSortedIndexes(keys []string) ([]*IndexResult, error) {
 				"title":    bson.M{"$first": "$document.title"},
 				"location": bson.M{"$push": "$location"},
 				"count":    bson.M{"$sum": 1},
+				"keys":     bson.M{"$push": "$key"},
 				"eval":     bson.M{"$sum": "$weight"},
 			},
 		},
@@ -74,7 +75,7 @@ func (c *indexes) SelectSortedIndexes(keys []string) ([]*IndexResult, error) {
 			"$sort": bson.M{"eval": -1},
 		},
 		{
-			"$limit": 30,
+			"$limit": 20,
 		},
 	}
 	csr, err := c.collection().Aggregate(ctx, pipeline)

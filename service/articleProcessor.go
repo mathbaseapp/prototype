@@ -8,6 +8,7 @@ import (
 	"strings"
 	"unicode/utf8"
 
+	"prototype.mathbase.app/mathml"
 	"prototype.mathbase.app/repository"
 
 	"prototype.mathbase.app/tokenizer"
@@ -45,12 +46,15 @@ type QiitaArticleProcessor struct {
 	Tokenizer tokenizer.Tokenizer
 }
 
+var alphabet = regexp.MustCompile("^[a-z]$")
+
 // Process 記事を処理する
 func (q *QiitaArticleProcessor) Process(document repository.Document) error {
 	if index, _ := repository.Indexes.SelectByID(document.ID); index != nil {
 		return errors.New("すでにトークナイズが実行された記事です")
 	}
 
+	var indexes []*repository.Index
 	formulas := q.drainFormula(document)
 	for _, formula := range formulas {
 		expr := formula.getValueInOneLine()
@@ -62,23 +66,22 @@ func (q *QiitaArticleProcessor) Process(document repository.Document) error {
 			continue
 		}
 
-		tokens, err := q.Tokenizer.Tokenize(res.Node)
-		if err != nil {
-			fmt.Println(err)
-			fmt.Println("formulaのtokenizeに失敗しました")
-			continue
-		}
-
-		var indexes []*repository.Index
-		for _, token := range tokens {
+		for _, node := range res.Node.List() {
+			base := 1.0
+			if alphabet.MatchString(node.Value) {
+				base = 0.01
+			}
+			token := mathml.Printer(node)
 			indexdoc := repository.IndexDocument{ID: document.ID, URL: document.URL, Title: document.Title}
-			weight := 1.0 / float64(len(formulas)) * float64(utf8.RuneCountInString(token))
+			weight := 1.0 / float64(len(formulas)) * float64(utf8.RuneCountInString(token)) * base
 			indexes = append(indexes, &repository.Index{Key: token, Location: strconv.Itoa(formula.startLine), Document: indexdoc, Weight: weight})
 		}
-		_, err = repository.Indexes.InsertMany(indexes)
-		if err != nil {
-			fmt.Println(err)
-		}
+
+	}
+
+	_, err := repository.Indexes.InsertMany(indexes)
+	if err != nil {
+		fmt.Println(err)
 	}
 	return nil
 }

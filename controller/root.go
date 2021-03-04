@@ -6,7 +6,6 @@ import (
 	"github.com/gin-contrib/cors"
 	"github.com/gin-contrib/multitemplate"
 	"github.com/gin-gonic/gin"
-	"prototype.mathbase.app/lg"
 	"prototype.mathbase.app/service"
 )
 
@@ -40,8 +39,7 @@ func queryByTex(c *gin.Context) {
 	queryStr := c.DefaultQuery("query", "")
 	results, err := service.QueryByLatex(queryStr)
 	if err != nil {
-		lg.F.Println(err)
-		panic("")
+		panic(err)
 	}
 	c.HTML(http.StatusOK, "search", gin.H{
 		"query":   queryStr,
@@ -53,7 +51,6 @@ func restQueryByTex(c *gin.Context) {
 	queryStr := c.DefaultQuery("query", "")
 	results, err := service.QueryByLatex(queryStr)
 	if err != nil {
-		lg.D.Println(err.Error())
 		c.JSON(http.StatusBadRequest, gin.H{
 			"error": err.Error(),
 		})
