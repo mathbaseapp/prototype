@@ -72,7 +72,7 @@ func (c *indexes) SelectSortedIndexes(keys []string) ([]*IndexResult, error) {
 			},
 		},
 		{
-			"$sort": bson.M{"count": -1},
+			"$sort": bson.M{"eval": -1},
 		},
 		{
 			"$limit": 20,

@@ -54,7 +54,7 @@ type QiitaArticleProcessor struct {
 	Tokenizer tokenizer.Tokenizer
 }
 
-var common = regexp.MustCompile("^([a-z]|\\d+|\\+|\\-|=\\(|\\))$")
+var common = regexp.MustCompile("^([a-z]|\\d+|\\+|\\-|=|\\(|\\))$")
 var alphabet = regexp.MustCompile("^([A-Z])$")
 
 // Process 記事を処理する
