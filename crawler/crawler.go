@@ -2,10 +2,11 @@ package crawler
 
 import (
 	"encoding/json"
-	"fmt"
 	"io/ioutil"
 	"net/http"
 	"strconv"
+
+	"prototype.mathbase.app/lg"
 )
 
 // Crawler クローラーの実体
@@ -43,8 +44,8 @@ func (c *Crawler) Crawle() ([]Article, error) {
 	articles, err := c.getArticles()
 
 	if err != nil {
-		fmt.Println(err)
-		fmt.Printf("currentTag: %s\tcurrentTagIndex: %d\tcurrentPageIndex: %d\n", TAGS[c.currentTagIndex], c.currentTagIndex, c.currentPageIndex)
+		lg.I.Println(err)
+		lg.I.Printf("currentTag: %s\tcurrentTagIndex: %d\tcurrentPageIndex: %d\n", TAGS[c.currentTagIndex], c.currentTagIndex, c.currentPageIndex)
 		c.goNextPage()
 		return nil, err
 	}
@@ -73,22 +74,22 @@ func (c *Crawler) getArticles() ([]Article, error) {
 	client := new(http.Client)
 	res, err := client.Do(req)
 	if err != nil {
-		fmt.Println("レスポンスの取得に失敗")
+		lg.I.Println("レスポンスの取得に失敗")
 		return make([]Article, 0), err
 	}
 	defer res.Body.Close()
 
 	body, err := ioutil.ReadAll(res.Body)
 	if err != nil {
-		fmt.Println("レスポンスの読み込みに失敗")
+		lg.I.Println("レスポンスの読み込みに失敗")
 		return make([]Article, 0), err
 	}
 
 	var articles []Article
 
 	if err := json.Unmarshal(body, &articles); err != nil {
-		fmt.Println("レスポンスのパースに失敗")
-		fmt.Println(string(body))
+		lg.I.Println("レスポンスのパースに失敗")
+		lg.I.Println(string(body))
 		return make([]Article, 0), err
 	}
 

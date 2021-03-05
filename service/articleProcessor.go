@@ -7,6 +7,7 @@ import (
 	"strconv"
 	"strings"
 
+	"prototype.mathbase.app/lg"
 	"prototype.mathbase.app/repository"
 
 	"prototype.mathbase.app/tokenizer"
@@ -62,23 +63,23 @@ func (q *QiitaArticleProcessor) Process(document repository.Document) error {
 		expr := formula.getValueInOneLine()
 		res, err := q.Parser.Parse(expr)
 		if err != nil {
-			fmt.Println(err)
-			fmt.Println("以下のformulaのパースに失敗しました")
-			fmt.Println(formula.getInfo())
+			lg.I.Println(err)
+			lg.I.Println("以下のformulaのパースに失敗しました")
+			lg.I.Println(formula.getInfo())
 			continue
 		}
 
 		tokens, err := q.Tokenizer.Tokenize(res.Node)
 		if err != nil {
-			fmt.Println(err)
-			fmt.Println("formulaのtokenizeに失敗しました")
+			lg.I.Println(err)
+			lg.I.Println("formulaのtokenizeに失敗しました")
 			continue
 		}
 		for _, token := range tokens {
 			index := &repository.Index{Key: token, Location: strconv.Itoa(formula.startLine), Document: indexDocument}
 			index, err = repository.Indexes.InsertOne(index)
 			if err != nil {
-				fmt.Println("index の保存時にエラーが発生しました")
+				lg.I.Println("index の保存時にエラーが発生しました")
 			}
 		}
 

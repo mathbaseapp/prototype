@@ -2,11 +2,11 @@ package repository
 
 import (
 	"context"
-	"fmt"
 	"time"
 
 	"github.com/google/uuid"
 	"go.mongodb.org/mongo-driver/bson"
+	"prototype.mathbase.app/lg"
 )
 
 // Documents DocumentRepository
@@ -73,7 +73,7 @@ func (c *documents) StreamEveryDocument(callback func(Document) error) error {
 		}
 		err = callback(*document)
 		if err != nil {
-			fmt.Println(err)
+			lg.I.Println(err)
 		}
 	}
 	if err := cur.Err(); err != nil {
