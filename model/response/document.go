@@ -1,6 +1,6 @@
 package response
 
-// Document ページ情報を格納するレスポンスオブジェクト
+// PageResult ページ情報を格納するレスポンスオブジェクト
 type Document struct {
 	Title string `json:"title"`
 	URL   string `json:"url"`

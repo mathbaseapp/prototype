@@ -9,7 +9,7 @@ import (
 	"prototype.mathbase.app/tokenizer"
 )
 
-// QueryByLatex Latexで検索
+// QueryByLatex
 func QueryByLatex(query string) ([]*response.Document, error) {
 
 	chunks := strings.Split(query, ",")
@@ -19,11 +19,11 @@ func QueryByLatex(query string) ([]*response.Document, error) {
 	alltoken := []string{}
 
 	for _, chunk := range chunks {
-		pseRes, err := parser.Parse(chunk)
+		pse_res, err := parser.Parse(chunk)
 		if err != nil {
 			return nil, err
 		}
-		tokens, err := tokenizer.Tokenize(pseRes.Node)
+		tokens, err := tokenizer.Tokenize(pse_res.Node)
 		if err != nil {
 			return nil, err
 		}
