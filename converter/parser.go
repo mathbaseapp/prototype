@@ -6,6 +6,7 @@ import (
 	"regexp"
 
 	"github.com/mattn/go-pipeline"
+	"prototype.mathbase.app/lg"
 	"prototype.mathbase.app/mathml"
 )
 
@@ -60,7 +61,8 @@ func (l *latexParser) Parse(source string) (*ParseResult, error) {
 
 func (latexParser) panicIfNoDependency() {
 	if _, err := exec.Command("pandoc", "-v").Output(); err != nil {
-		panic("pandoc cannot execute. is not installed?")
+		lg.F.Println("pandoc cannot execute. is not installed?")
+		panic("")
 	}
 }
 
@@ -87,6 +89,7 @@ func GetParser(docType DocumentType) Parser {
 	case MathML:
 		return &mathmlParser{}
 	default:
-		panic("incorrect document type.")
+		lg.F.Println("incorrect document type.")
+		panic("")
 	}
 }

@@ -5,6 +5,7 @@ import (
 
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
+	"prototype.mathbase.app/lg"
 )
 
 const (
@@ -19,7 +20,8 @@ func genClient() *mongo.Client {
 	ctx := context.Background()
 	client, err := mongo.Connect(ctx, options.Client().ApplyURI("mongodb://"+user+":"+password+"@localhost:27017"))
 	if err != nil {
-		panic("database initialization failed.")
+		lg.F.Println("database initialization failed.")
+		panic("")
 	}
 	return client
 }
