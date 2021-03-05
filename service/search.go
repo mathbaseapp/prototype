@@ -12,7 +12,7 @@ import (
 	"prototype.mathbase.app/tokenizer"
 )
 
-// QueryByLatex Latexで検索
+// QueryByLatex
 func QueryByLatex(query string) ([]*response.Document, error) {
 
 	chunks := strings.Split(query, ",")

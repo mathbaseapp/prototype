@@ -72,7 +72,7 @@ func (c *indexes) SelectSortedIndexes(keys []string) ([]*IndexResult, error) {
 			},
 		},
 		{
-			"$sort": bson.M{"eval": -1},
+			"$sort": bson.M{"count": -1},
 		},
 		{
 			"$limit": 20,
@@ -98,5 +98,6 @@ func (c *indexes) SelectByID(ID string) (*Index, error) {
 	if err != nil {
 		return nil, err
 	}
+
 	return &index, err
 }
