@@ -1,11 +1,11 @@
 package service
 
 import (
-	"fmt"
 	"strings"
 
 	"github.com/k0kubun/pp"
 	"prototype.mathbase.app/converter"
+	"prototype.mathbase.app/lg"
 	"prototype.mathbase.app/mathml"
 	"prototype.mathbase.app/model/response"
 	"prototype.mathbase.app/repository"
@@ -23,7 +23,7 @@ func QueryByLatex(query string) ([]*response.Document, error) {
 
 	for _, chunk := range chunks {
 		pseRes, err := parser.Parse(chunk)
-		fmt.Println(mathml.Printer(pseRes.Node))
+		lg.I.Println(mathml.Printer(pseRes.Node))
 		if err != nil {
 			return nil, err
 		}

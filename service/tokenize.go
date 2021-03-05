@@ -9,6 +9,7 @@ import (
 	"unicode/utf8"
 
 	"prototype.mathbase.app/converter"
+	"prototype.mathbase.app/lg"
 	"prototype.mathbase.app/mathml"
 	"prototype.mathbase.app/repository"
 	"prototype.mathbase.app/tokenizer"
@@ -69,9 +70,9 @@ func (q *QiitaArticleProcessor) Process(document repository.Document) error {
 		expr := formula.getValueInOneLine()
 		res, err := q.Parser.Parse(expr)
 		if err != nil {
-			fmt.Println(err)
-			fmt.Println("以下のformulaのパースに失敗しました")
-			fmt.Println(formula.getInfo())
+			lg.I.Println(err)
+			lg.I.Println("以下のformulaのパースに失敗しました")
+			lg.I.Println(formula.getInfo())
 			continue
 		}
 
@@ -91,7 +92,7 @@ func (q *QiitaArticleProcessor) Process(document repository.Document) error {
 
 	_, err := repository.Indexes.InsertMany(indexes)
 	if err != nil {
-		fmt.Println(err)
+		lg.I.Println(err)
 	}
 	return nil
 }
