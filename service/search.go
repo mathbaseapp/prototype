@@ -3,7 +3,6 @@ package service
 import (
 	"strings"
 
-	"github.com/k0kubun/pp"
 	"prototype.mathbase.app/converter"
 	"prototype.mathbase.app/lg"
 	"prototype.mathbase.app/mathml"
@@ -12,7 +11,7 @@ import (
 	"prototype.mathbase.app/tokenizer"
 )
 
-// QueryByLatex
+// QueryByLatex Latexの検索
 func QueryByLatex(query string) ([]*response.Document, error) {
 
 	chunks := strings.Split(query, ",")
@@ -38,8 +37,6 @@ func QueryByLatex(query string) ([]*response.Document, error) {
 	if err != nil {
 		return nil, err
 	}
-
-	pp.Println(indexes[0])
 
 	documents := []*response.Document{}
 	for _, index := range indexes {
