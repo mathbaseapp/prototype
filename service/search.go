@@ -40,7 +40,7 @@ func QueryByLatex(query string) ([]*response.Document, error) {
 
 	documents := []*response.Document{}
 	for _, index := range indexes {
-		documents = append(documents, &response.Document{Title: index.Title, URL: index.URL, Point: index.Eval})
+		documents = append(documents, &response.Document{Title: index.Title, URL: index.URL, Score: index.Score})
 	}
 	return documents, nil
 }

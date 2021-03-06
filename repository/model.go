@@ -7,6 +7,7 @@ type Index struct {
 	Location string        `location`
 	Document IndexDocument `document`
 	Weight   float64       `weight`
+	Formula  string        `formula`
 }
 
 // IndexDocument インデックスに入れるドキュメントを表現します（Documentとの整合性はアプリケーション層で担保して下さい）
@@ -16,12 +17,14 @@ type IndexDocument struct {
 	Title string `title`
 }
 
+// IndexResult 検索結果を表示
 type IndexResult struct {
 	URL      string   `_id`
 	Title    string   `title`
 	Location []string `location`
 	Count    int      `count`
-	Eval     float64  `eval`
+	Formula  string   `formula`
+	Score    float64  `score`
 	Keys     []string `keys`
 }
 
