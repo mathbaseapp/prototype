@@ -5,8 +5,6 @@ import (
 	"strings"
 
 	"prototype.mathbase.app/converter"
-	"prototype.mathbase.app/lg"
-	"prototype.mathbase.app/mathml"
 	"prototype.mathbase.app/model/response"
 	"prototype.mathbase.app/repository"
 	"prototype.mathbase.app/tokenizer"
@@ -23,7 +21,6 @@ func QueryByLatex(query string) ([]*response.Document, error) {
 
 	for _, chunk := range chunks {
 		pseRes, err := parser.Parse(chunk)
-		lg.I.Println(mathml.StringWithNoAttr(pseRes.Node))
 		if err != nil {
 			return nil, err
 		}

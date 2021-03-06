@@ -40,13 +40,16 @@ func queryByTex(c *gin.Context) {
 	queryStr := c.DefaultQuery("query", "")
 	results, err := service.QueryByLatex(queryStr)
 	if err != nil {
-		lg.F.Println(err)
-		panic("")
+		lg.I.Println(err)
+		c.HTML(http.StatusBadRequest, "index", gin.H{
+			"error": "failed to parse input.",
+		})
+	} else {
+		c.HTML(http.StatusOK, "search", gin.H{
+			"query":   queryStr,
+			"results": results,
+		})
 	}
-	c.HTML(http.StatusOK, "search", gin.H{
-		"query":   queryStr,
-		"results": results,
-	})
 }
 
 func restQueryByTex(c *gin.Context) {
