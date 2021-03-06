@@ -2,7 +2,6 @@ package service
 
 import (
 	"regexp"
-	"strconv"
 	"strings"
 	"unicode/utf8"
 
@@ -62,6 +61,7 @@ func (q *QiitaArticleProcessor) Process(document repository.Document) error {
 			continue
 		}
 		mathMLStr := mathml.StringWithAttr(res.Node)
+		formula := repository.Formula{Location: formula.startLine, MathML: mathMLStr}
 		for _, node := range res.Node.List() {
 			base := 1.0
 			if common.MatchString(node.Value) {
@@ -73,7 +73,7 @@ func (q *QiitaArticleProcessor) Process(document repository.Document) error {
 			indexdoc := repository.IndexDocument{ID: document.ID, URL: document.URL, Title: document.Title}
 			weight := 1.0 / float64(len(formulas)) * float64(utf8.RuneCountInString(token)) * base
 			indexes = append(indexes, &repository.Index{
-				Key: token, Location: strconv.Itoa(formula.startLine), Document: indexdoc, Weight: weight, Formula: mathMLStr})
+				Key: token, Document: indexdoc, Weight: weight, Formula: formula})
 		}
 	}
 

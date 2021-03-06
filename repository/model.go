@@ -4,10 +4,15 @@ package repository
 type Index struct {
 	ID       string        `_id`
 	Key      string        `key`
-	Location string        `location`
-	Document IndexDocument `document`
 	Weight   float64       `weight`
-	Formula  string        `formula`
+	Document IndexDocument `document`
+	Formula  Formula       `formula`
+}
+
+// Formula 数式を表現する
+type Formula struct {
+	Location int    `location`
+	MathML   string `mathml`
 }
 
 // IndexDocument インデックスに入れるドキュメントを表現します（Documentとの整合性はアプリケーション層で担保して下さい）
@@ -19,13 +24,12 @@ type IndexDocument struct {
 
 // IndexResult 検索結果を表示
 type IndexResult struct {
-	URL      string   `_id`
-	Title    string   `title`
-	Location []string `location`
-	Count    int      `count`
-	Formula  string   `formula`
-	Score    float64  `score`
-	Keys     []string `keys`
+	URL     string     `_id`
+	Title   string     `title`
+	Count   int        `count`
+	Score   float64    `score`
+	Keys    []string   `keys`
+	Formula []*Formula `formula`
 }
 
 // Document qiitaのページ
