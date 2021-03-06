@@ -18,7 +18,7 @@ type MathmlTokenizer struct {
 // Tokenize トークナイズ
 func (m *MathmlTokenizer) Tokenize(mn *mathml.Node) ([]string, error) {
 	slice := mn.Map(func(n *mathml.Node) interface{} {
-		return mathml.Printer(n)
+		return mathml.StringWithNoAttr(n)
 	})
 	res := make([]string, len(slice))
 	for index, item := range slice {

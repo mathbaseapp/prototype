@@ -2,23 +2,49 @@ package mathml
 
 import "strings"
 
-// Printer Nodeを文字列として出力します
-func Printer(node *Node) string {
+// StringWithNoAttr Nodeを文字列として出力します
+func StringWithNoAttr(node *Node) string {
 
 	builder := strings.Builder{}
-	printer(node, &builder)
+	stringWithNoAttr(node, &builder)
 	return builder.String()
 }
 
-func printer(node *Node, builder *strings.Builder) {
+func stringWithNoAttr(node *Node, builder *strings.Builder) {
 
 	builder.WriteString("<")
 	builder.WriteString(node.Name)
 	builder.WriteString(">")
 	builder.WriteString(node.Value)
 	for _, child := range node.Children {
-		printer(child, builder)
+		stringWithNoAttr(child, builder)
 	}
+	builder.WriteString("</")
+	builder.WriteString(node.Name)
+	builder.WriteString(">")
+}
+
+// StringWithAttr 属性を含めて出力します
+func StringWithAttr(node *Node) string {
+
+	builder := strings.Builder{}
+	stringWithAttr(node, &builder)
+	return builder.String()
+}
+
+func stringWithAttr(node *Node, builder *strings.Builder) {
+	builder.WriteString("<")
+	builder.WriteString(node.Name)
+	builder.WriteString(" ")
+	for _, attr := range node.Attrs {
+		builder.WriteString(attr.Key)
+		builder.WriteString("=\"")
+		builder.WriteString(attr.Value)
+		builder.WriteString("\" ")
+	}
+	builder.WriteString(">")
+	stringWithAttr(node, builder)
+	builder.WriteString(node.Value)
 	builder.WriteString("</")
 	builder.WriteString(node.Name)
 	builder.WriteString(">")

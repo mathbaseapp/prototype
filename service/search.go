@@ -22,7 +22,7 @@ func QueryByLatex(query string) ([]*response.Document, error) {
 
 	for _, chunk := range chunks {
 		pseRes, err := parser.Parse(chunk)
-		lg.I.Println(mathml.Printer(pseRes.Node))
+		lg.I.Println(mathml.StringWithNoAttr(pseRes.Node))
 		if err != nil {
 			return nil, err
 		}
