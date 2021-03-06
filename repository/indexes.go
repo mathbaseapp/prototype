@@ -32,6 +32,9 @@ func (c *indexes) InsertOne(index *Index) (*Index, error) {
 }
 
 func (c *indexes) InsertMany(indexes []*Index) ([]*Index, error) {
+	if len(indexes) == 0 {
+		return indexes, nil
+	}
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
 	for _, index := range indexes {
