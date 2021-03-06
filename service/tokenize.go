@@ -1,8 +1,6 @@
 package service
 
 import (
-	"errors"
-	"fmt"
 	"regexp"
 	"strconv"
 	"strings"
@@ -31,16 +29,6 @@ type formula struct {
 	value      []string
 }
 
-func (f *formula) getInfo() string {
-	var str string
-	str += fmt.Sprintf("startLine: %d\t", f.startLine)
-	str += fmt.Sprintf("lineLength: %d\n", f.lineLength)
-	for _, v := range f.value {
-		str += fmt.Sprintf("\t%s\n", v)
-	}
-	return str
-}
-
 func (f *formula) getValueInOneLine() string {
 	var str string
 	for _, v := range f.value {
@@ -61,7 +49,7 @@ var alphabet = regexp.MustCompile("^([A-Z])$")
 // Process 記事を処理する
 func (q *QiitaArticleProcessor) Process(document repository.Document) error {
 	if index, _ := repository.Indexes.SelectByID(document.ID); index != nil {
-		return errors.New("すでにトークナイズが実行された記事です")
+		return nil
 	}
 
 	var indexes []*repository.Index
@@ -71,8 +59,6 @@ func (q *QiitaArticleProcessor) Process(document repository.Document) error {
 		res, err := q.Parser.Parse(expr)
 		if err != nil {
 			lg.I.Println(err)
-			lg.I.Println("以下のformulaのパースに失敗しました")
-			lg.I.Println(formula.getInfo())
 			continue
 		}
 
@@ -93,6 +79,7 @@ func (q *QiitaArticleProcessor) Process(document repository.Document) error {
 	_, err := repository.Indexes.InsertMany(indexes)
 	if err != nil {
 		lg.I.Println(err)
+		return err
 	}
 	return nil
 }
