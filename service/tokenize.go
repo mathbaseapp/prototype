@@ -61,7 +61,7 @@ func (q *QiitaArticleProcessor) Process(document repository.Document) error {
 			lg.I.Println(err)
 			continue
 		}
-
+		mathMLStr := mathml.StringWithAttr(res.Node)
 		for _, node := range res.Node.List() {
 			base := 1.0
 			if common.MatchString(node.Value) {
@@ -72,7 +72,8 @@ func (q *QiitaArticleProcessor) Process(document repository.Document) error {
 			token := mathml.StringWithNoAttr(node)
 			indexdoc := repository.IndexDocument{ID: document.ID, URL: document.URL, Title: document.Title}
 			weight := 1.0 / float64(len(formulas)) * float64(utf8.RuneCountInString(token)) * base
-			indexes = append(indexes, &repository.Index{Key: token, Location: strconv.Itoa(formula.startLine), Document: indexdoc, Weight: weight})
+			indexes = append(indexes, &repository.Index{
+				Key: token, Location: strconv.Itoa(formula.startLine), Document: indexdoc, Weight: weight, Formula: mathMLStr})
 		}
 	}
 
