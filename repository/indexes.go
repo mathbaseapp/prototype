@@ -66,16 +66,20 @@ func (c *indexes) SelectSortedIndexes(keys []string) ([]*IndexResult, error) {
 		},
 		{
 			"$group": bson.M{
-				"_id":      "$document.url",
-				"title":    bson.M{"$first": "$document.title"},
-				"location": bson.M{"$push": "$location"},
-				"count":    bson.M{"$sum": 1},
-				"keys":     bson.M{"$push": "$key"},
-				"eval":     bson.M{"$sum": "$weight"},
+				"_id":   "$document.url",
+				"title": bson.M{"$first": "$document.title"},
+				"count": bson.M{"$sum": 1},
+				"formula": bson.M{"$push": bson.M{
+					"location": "$formula.location",
+					"mathml":   "$formula.mathml",
+					"score":    "$weight",
+				}},
+				"keys":  bson.M{"$push": "$key"},
+				"score": bson.M{"$sum": "$weight"},
 			},
 		},
 		{
-			"$sort": bson.M{"eval": -1},
+			"$sort": bson.M{"score": -1},
 		},
 		{
 			"$limit": 20,

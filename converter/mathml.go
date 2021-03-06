@@ -22,7 +22,10 @@ func mathMLFactory(node *xmlNode) (*mathml.Node, error) {
 		}
 		children = append(children, mm)
 	}
-
-	mNode := mathml.Node{Name: node.Name.Local, Value: node.Value, Children: children, Style: mathml.Presentation}
+	attrs := []*mathml.Attr{}
+	for _, attr := range node.Attr {
+		attrs = append(attrs, &mathml.Attr{Key: attr.Name.Local, Value: attr.Value})
+	}
+	mNode := mathml.Node{Name: node.Name.Local, Value: node.Value, Children: children, Style: mathml.Presentation, Attrs: attrs}
 	return &mNode, nil
 }

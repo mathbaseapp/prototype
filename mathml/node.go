@@ -14,8 +14,15 @@ const (
 type Node struct {
 	Name     string
 	Value    string
+	Attrs    []*Attr
 	Children []*Node
 	Style    MarkupStyle
+}
+
+// Attr MathMLにおける属性を表す
+type Attr struct {
+	Key   string
+	Value string
 }
 
 // Map 下にある全てのノードについてcallbackを実行し結果をsliceで返す

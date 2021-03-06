@@ -1,11 +1,10 @@
 package service
 
 import (
+	"html/template"
 	"strings"
 
 	"prototype.mathbase.app/converter"
-	"prototype.mathbase.app/lg"
-	"prototype.mathbase.app/mathml"
 	"prototype.mathbase.app/model/response"
 	"prototype.mathbase.app/repository"
 	"prototype.mathbase.app/tokenizer"
@@ -22,7 +21,6 @@ func QueryByLatex(query string) ([]*response.Document, error) {
 
 	for _, chunk := range chunks {
 		pseRes, err := parser.Parse(chunk)
-		lg.I.Println(mathml.Printer(pseRes.Node))
 		if err != nil {
 			return nil, err
 		}
@@ -40,7 +38,21 @@ func QueryByLatex(query string) ([]*response.Document, error) {
 
 	documents := []*response.Document{}
 	for _, index := range indexes {
-		documents = append(documents, &response.Document{Title: index.Title, URL: index.URL, Point: index.Eval})
+		documents = append(documents, &response.Document{
+			Title: index.Title, URL: index.URL, Score: index.Score, MathML: template.HTML(freqEquation(index.Formulas).MathML)})
 	}
 	return documents, nil
+}
+
+func freqEquation(formulas []*repository.FormulaResult) *repository.FormulaResult {
+
+	maxScore := 0.0
+	var max *repository.FormulaResult
+	for _, formula := range formulas {
+		if maxScore <= formula.Score {
+			maxScore = formula.Score
+			max = formula
+		}
+	}
+	return max
 }

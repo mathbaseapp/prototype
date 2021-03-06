@@ -2,7 +2,6 @@ package service
 
 import (
 	"regexp"
-	"strconv"
 	"strings"
 	"unicode/utf8"
 
@@ -24,8 +23,8 @@ func Tokenize() {
 }
 
 type formula struct {
-	startLine  int // 何行目に現れたか
-	lineLength int // 何行続いたか
+	startLine  int // 何行目に現れたか // TODO テキストドキュメントは先頭からのバイト（文字）数で指定する
+	lineLength int // 何行続いたか // TODO 同上
 	value      []string
 }
 
@@ -39,8 +38,8 @@ func (f *formula) getValueInOneLine() string {
 
 // QiitaArticleProcessor qiitaの記事を処理する
 type QiitaArticleProcessor struct {
-	Parser    converter.Parser
-	Tokenizer tokenizer.Tokenizer
+	Parser    converter.Parser    // TODO Readerのパーサーへの依存は不要
+	Tokenizer tokenizer.Tokenizer // TODO Readerのトークナイザーへの依存は不要
 }
 
 var common = regexp.MustCompile("^([a-z]|\\d+|\\+|\\-|=|\\(|\\))$")
@@ -61,7 +60,8 @@ func (q *QiitaArticleProcessor) Process(document repository.Document) error {
 			lg.I.Println(err)
 			continue
 		}
-
+		mathMLStr := mathml.StringWithAttr(res.Node)
+		formula := repository.Formula{Location: formula.startLine, MathML: mathMLStr}
 		for _, node := range res.Node.List() {
 			base := 1.0
 			if common.MatchString(node.Value) {
@@ -69,10 +69,11 @@ func (q *QiitaArticleProcessor) Process(document repository.Document) error {
 			} else if alphabet.MatchString(node.Value) {
 				base = 0.01
 			}
-			token := mathml.Printer(node)
+			token := mathml.StringWithNoAttr(node)
 			indexdoc := repository.IndexDocument{ID: document.ID, URL: document.URL, Title: document.Title}
 			weight := 1.0 / float64(len(formulas)) * float64(utf8.RuneCountInString(token)) * base
-			indexes = append(indexes, &repository.Index{Key: token, Location: strconv.Itoa(formula.startLine), Document: indexdoc, Weight: weight})
+			indexes = append(indexes, &repository.Index{
+				Key: token, Document: indexdoc, Weight: weight, Formula: formula})
 		}
 	}
 
