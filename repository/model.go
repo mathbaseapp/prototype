@@ -6,6 +6,7 @@ type Index struct {
 	Key      string        `key`
 	Location string        `location`
 	Document IndexDocument `document`
+	Weight   float64       `weight`
 }
 
 // IndexDocument インデックスに入れるドキュメントを表現します（Documentとの整合性はアプリケーション層で担保して下さい）
@@ -20,6 +21,8 @@ type IndexResult struct {
 	Title    string   `title`
 	Location []string `location`
 	Count    int      `count`
+	Eval     float64  `eval`
+	Keys     []string `keys`
 }
 
 // Document qiitaのページ

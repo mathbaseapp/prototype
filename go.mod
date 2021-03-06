@@ -9,4 +9,5 @@ require (
 	github.com/google/uuid v1.2.0
 	github.com/mattn/go-pipeline v0.0.0-20190323144519-32d779b32768
 	go.mongodb.org/mongo-driver v1.4.6
+	golang.org/x/sys v0.0.0-20200223170610-d5e6a3e2c0ae // indirect
 )

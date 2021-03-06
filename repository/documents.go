@@ -6,7 +6,6 @@ import (
 
 	"github.com/google/uuid"
 	"go.mongodb.org/mongo-driver/bson"
-	"prototype.mathbase.app/lg"
 )
 
 // Documents DocumentRepository
@@ -71,10 +70,7 @@ func (c *documents) StreamEveryDocument(callback func(Document) error) error {
 		if err != nil {
 			return err
 		}
-		err = callback(*document)
-		if err != nil {
-			lg.I.Println(err)
-		}
+		_ = callback(*document)
 	}
 	if err := cur.Err(); err != nil {
 		return err

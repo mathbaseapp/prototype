@@ -31,6 +31,30 @@ func (c *indexes) InsertOne(index *Index) (*Index, error) {
 	return index, nil
 }
 
+func (c *indexes) InsertMany(indexes []*Index) ([]*Index, error) {
+	if len(indexes) == 0 {
+		return indexes, nil
+	}
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
+	for _, index := range indexes {
+		id, err := uuid.NewRandom()
+		if err != nil {
+			return nil, err
+		}
+		index.ID = id.String()
+	}
+	var anys []interface{}
+	for _, any := range indexes {
+		anys = append(anys, any)
+	}
+	_, err := c.collection().InsertMany(ctx, anys)
+	if err != nil {
+		return nil, err
+	}
+	return indexes, nil
+}
+
 func (c *indexes) SelectSortedIndexes(keys []string) ([]*IndexResult, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
@@ -46,13 +70,15 @@ func (c *indexes) SelectSortedIndexes(keys []string) ([]*IndexResult, error) {
 				"title":    bson.M{"$first": "$document.title"},
 				"location": bson.M{"$push": "$location"},
 				"count":    bson.M{"$sum": 1},
+				"keys":     bson.M{"$push": "$key"},
+				"eval":     bson.M{"$sum": "$weight"},
 			},
 		},
 		{
-			"$sort": bson.M{"count": -1},
+			"$sort": bson.M{"eval": -1},
 		},
 		{
-			"$limit": 30,
+			"$limit": 20,
 		},
 	}
 	csr, err := c.collection().Aggregate(ctx, pipeline)
@@ -67,11 +93,11 @@ func (c *indexes) SelectSortedIndexes(keys []string) ([]*IndexResult, error) {
 	return results, nil
 }
 
-func (c *indexes) SelectByIndexDocument(indexDocument IndexDocument) (*Index, error) {
+func (c *indexes) SelectByID(ID string) (*Index, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
 	index := Index{}
-	err := c.collection().FindOne(ctx, bson.M{"document.id": indexDocument.ID}).Decode(&index)
+	err := c.collection().FindOne(ctx, bson.M{"document.id": ID}).Decode(&index)
 	if err != nil {
 		return nil, err
 	}
