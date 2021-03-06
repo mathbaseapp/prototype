@@ -6,12 +6,12 @@
         </div>
 
         <div class="pure-u-1">
-            <ul>
+            <ol>
                 {{range .results}}
                     <li><a href="{{.URL}}">{{.Title}}</a> ---------- {{.Score}}</li>
-                    {{.MathML}}
+                    <p>{{.MathML}}</p>
                 {{end}}
-            </ul>
+            </ol>
         </div>
     </div>
 {{end}}
