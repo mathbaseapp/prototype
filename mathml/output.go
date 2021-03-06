@@ -35,15 +35,17 @@ func StringWithAttr(node *Node) string {
 func stringWithAttr(node *Node, builder *strings.Builder) {
 	builder.WriteString("<")
 	builder.WriteString(node.Name)
-	builder.WriteString(" ")
 	for _, attr := range node.Attrs {
+		builder.WriteString(" ")
 		builder.WriteString(attr.Key)
 		builder.WriteString("=\"")
 		builder.WriteString(attr.Value)
-		builder.WriteString("\" ")
+		builder.WriteString("\"")
 	}
 	builder.WriteString(">")
-	stringWithAttr(node, builder)
+	for _, child := range node.Children {
+		stringWithAttr(child, builder)
+	}
 	builder.WriteString(node.Value)
 	builder.WriteString("</")
 	builder.WriteString(node.Name)
