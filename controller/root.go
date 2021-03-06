@@ -42,7 +42,7 @@ func queryByTex(c *gin.Context) {
 	if err != nil {
 		lg.I.Println(err)
 		c.HTML(http.StatusBadRequest, "index", gin.H{
-			"error": "failed to parse input.",
+			"error": "failed to parse input: \"" + queryStr + "\"",
 		})
 	} else {
 		c.HTML(http.StatusOK, "search", gin.H{
