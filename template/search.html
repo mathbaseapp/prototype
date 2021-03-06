@@ -9,6 +9,7 @@
             <ul>
                 {{range .results}}
                     <li><a href="{{.URL}}">{{.Title}}</a> ---------- {{.Score}}</li>
+                    {{.MathML}}
                 {{end}}
             </ul>
         </div>

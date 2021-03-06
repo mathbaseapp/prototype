@@ -24,12 +24,19 @@ type IndexDocument struct {
 
 // IndexResult 検索結果を表示
 type IndexResult struct {
-	URL     string     `_id`
-	Title   string     `title`
-	Count   int        `count`
-	Score   float64    `score`
-	Keys    []string   `keys`
-	Formula []*Formula `formula`
+	URL      string           `_id`
+	Title    string           `title`
+	Count    int              `count`
+	Score    float64          `score`
+	Keys     []string         `keys`
+	Formulas []*FormulaResult `formula`
+}
+
+// FormulaResult 検索結果を表示
+type FormulaResult struct {
+	Location int     `location`
+	MathML   string  `mathml`
+	Score    float64 `score`
 }
 
 // Document qiitaのページ
