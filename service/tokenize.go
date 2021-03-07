@@ -19,7 +19,10 @@ func Tokenize() {
 	tokenizer := &tokenizer.MathmlTokenizer{}
 	processor := &QiitaArticleProcessor{Parser: parser, Tokenizer: tokenizer}
 
-	repository.Documents.StreamEveryDocument(processor.Process)
+	err := repository.Documents.StreamEveryDocument(processor.Process)
+	if err != nil {
+		lg.E.Println(err)
+	}
 }
 
 type formula struct {
