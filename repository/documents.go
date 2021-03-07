@@ -57,8 +57,7 @@ func (c *documents) SelectByID(ID string) (*Document, error) {
 
 // StreamAllDocument
 func (c *documents) StreamEveryDocument(callback func(Document) error) error {
-	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
-	defer cancel()
+	ctx := context.Background()
 	cur, err := c.collection().Find(ctx, bson.D{})
 	if err != nil {
 		return err
