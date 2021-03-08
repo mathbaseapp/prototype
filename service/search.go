@@ -5,35 +5,39 @@ import (
 	"strings"
 
 	"prototype.mathbase.app/converter"
+	"prototype.mathbase.app/mathml"
 	"prototype.mathbase.app/model/response"
 	"prototype.mathbase.app/repository"
 	"prototype.mathbase.app/tokenizer"
 )
 
 // QueryByLatex Latexの検索
-func QueryByLatex(query string) ([]*response.Document, error) {
+func QueryByLatex(query string) ([]*response.Document, []*response.Query, error) {
 
 	chunks := strings.Split(query, ",")
 	parser := converter.GetParser(converter.Latex)
 	tokenizer := tokenizer.MathmlTokenizer{}
 
+	queryList := []*response.Query{}
 	alltoken := []string{}
 
 	for _, chunk := range chunks {
 		pseRes, err := parser.Parse(chunk)
 		if err != nil {
-			return nil, err
+			return nil, nil, err
 		}
+		queryList = append(queryList,
+			&response.Query{MathML: template.HTML(mathml.StringWithAttr(pseRes.Node)), Source: chunk, Type: "latex"})
 		tokens, err := tokenizer.Tokenize(pseRes.Node)
 		if err != nil {
-			return nil, err
+			return nil, nil, err
 		}
 		alltoken = append(alltoken, tokens...)
 	}
 
 	indexes, err := repository.Indexes.SelectSortedIndexes(alltoken)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
 	documents := []*response.Document{}
@@ -41,7 +45,7 @@ func QueryByLatex(query string) ([]*response.Document, error) {
 		documents = append(documents, &response.Document{
 			Title: index.Title, URL: index.URL, Score: index.Score, MathML: template.HTML(freqEquation(index.Formulas).MathML)})
 	}
-	return documents, nil
+	return documents, queryList, nil
 }
 
 func freqEquation(formulas []*repository.FormulaResult) *repository.FormulaResult {
