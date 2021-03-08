@@ -48,6 +48,7 @@ func queryByTex(c *gin.Context) {
 		c.HTML(http.StatusOK, "search", gin.H{
 			"results": results,
 			"queries": queries,
+			"input":   queryStr,
 		})
 	}
 }
