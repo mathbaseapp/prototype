@@ -42,7 +42,7 @@ func queryByTex(c *gin.Context) {
 	if err != nil {
 		lg.I.Println(err)
 		c.HTML(http.StatusBadRequest, "index", gin.H{
-			"error": "something wrong processing the query.: \"" + queryStr + "\"",
+			"error": "something wrong with processing the query.: \"" + queryStr + "\"",
 		})
 	} else {
 		c.HTML(http.StatusOK, "search", gin.H{
@@ -58,7 +58,7 @@ func restQueryByTex(c *gin.Context) {
 	if err != nil {
 		lg.I.Println(err.Error())
 		c.JSON(http.StatusBadRequest, gin.H{
-			"error": "something wrong processing the query.: \"" + queryStr + "\"",
+			"error": "something wrong with processing the query.: \"" + queryStr + "\"",
 		})
 	} else {
 		c.JSON(http.StatusOK, gin.H{
